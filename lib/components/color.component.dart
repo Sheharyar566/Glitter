@@ -120,7 +120,7 @@ class _ColorComponentState extends State<ColorComponent> {
                               onPressed: () async {
                                 try {
                                   if (isFavorite) {
-                                    await dbService.deleteColor(hexValue);
+                                    // await dbService.deleteColor(hexValue);
 
                                     if (widget.favorite != null)
                                       widget.remove();
@@ -178,13 +178,15 @@ class _ColorComponentState extends State<ColorComponent> {
                               copyColor(context, hexValue);
                             },
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.red,
+                          if (widget.favorite != null &&
+                              widget.favorite != true)
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              ),
+                              onPressed: widget.remove,
                             ),
-                            onPressed: widget.remove,
-                          ),
                         ],
                       ),
                     ),
@@ -197,7 +199,7 @@ class _ColorComponentState extends State<ColorComponent> {
                           });
                         },
                         tooltip: 'Go back',
-                        icon: Icon(Icons.arrow_back_ios),
+                        icon: Icon(Icons.close_rounded),
                       ),
                     ),
                   ],

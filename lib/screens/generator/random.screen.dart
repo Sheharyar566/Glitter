@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/components/color.component.dart';
 import 'package:glitter/components/drawer.component.dart';
+import 'package:glitter/utils/db.util.dart';
 import 'package:palette/palette.dart';
 
 class RandomScreen extends StatefulWidget {
@@ -73,22 +74,7 @@ class _RandomScreenState extends State<RandomScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: generatePalette,
         isExtended: true,
-        child: Icon(Icons.refresh_rounded),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (value) {
-          print(value.toString());
-        },
-        items: [
-          BottomNavigationBarItem(
-            label: 'Color',
-            icon: Icon(Icons.restart_alt),
-          ),
-          BottomNavigationBarItem(
-            label: 'Color',
-            icon: Icon(Icons.restart_alt),
-          ),
-        ],
+        child: Icon(Icons.restart_alt_rounded),
       ),
       body: SingleChildScrollView(
         controller: _controller,
@@ -100,7 +86,13 @@ class _RandomScreenState extends State<RandomScreen> {
                 (color) => ColorComponent(
                   key: ValueKey(color),
                   color: color,
-                  remove: () {
+                  remove: () async {
+                    try {
+                      await dbService.deleteColor(
+                          '#${color.value.toRadixString(16).substring(2).toUpperCase()}');
+                    } catch (e) {
+                      print('Error occured');
+                    }
                     setState(() {
                       colors.removeWhere((item) => item.value == color.value);
                       count = count - 1;

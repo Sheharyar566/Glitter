@@ -6,7 +6,7 @@ class _DBService {
 
   Future<void> init() async {
     await Hive.initFlutter();
-    await Hive.openBox(_colorsDB);
+    await Hive.openBox<String>(_colorsDB);
   }
 
   Future<void> addColor(String _color) async {
@@ -18,14 +18,23 @@ class _DBService {
     }
   }
 
+  Future<void> deleteColorWithIndex(int _index) async {
+    try {
+      final Box<String> _box = Hive.box<String>(_colorsDB);
+      await _box.deleteAt(_index);
+    } catch (e) {
+      print('Error occured while deleting the colors with index: $e');
+    }
+  }
+
   Future<void> deleteColor(String _color) async {
     try {
       final Box<String> _box = Hive.box<String>(_colorsDB);
-      final int _index = _box.values.toList().indexOf(_color);
+      final int _temp = _box.values.toList().indexOf(_color);
 
-      await _box.deleteAt(_index);
+      await _box.deleteAt(_temp);
     } catch (e) {
-      print('Error occured while loading the colors db: $e');
+      print('Error occured while delete the colors: $e');
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
+import 'package:glitter/components/color.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/utils/db.util.dart';
 
@@ -9,16 +10,20 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
-  late List<Color> colors;
-  late int count;
+  List<Color> _colors = [];
   final ScrollController _controller = ScrollController();
 
-  Future<void> getColors() async {
+  @override
+  void initState() {
+    super.initState();
+    _loadColors();
+  }
+
+  Future<void> _loadColors() async {
     try {
       final List<Color> _temp = await dbService.getColors();
       setState(() {
-        colors = _temp;
-        count = _temp.length;
+        _colors = _temp;
       });
     } catch (e) {
       print('Error occured while loading the colors list');
@@ -36,6 +41,25 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           padding: const EdgeInsets.all(20.0),
           child: Column(
             children: [
+              ..._colors.asMap().entries.map(
+                    (entry) => ColorComponent(
+                      favorite: true,
+                      color: entry.value,
+                      remove: () async {
+                        try {
+                          await dbService.deleteColorWithIndex(entry.key);
+                          final List<Color> _temp = this._colors;
+                          _temp.removeAt(entry.key);
+
+                          setState(() {
+                            _colors = _temp;
+                          });
+                        } catch (e) {
+                          print('Failed to remove color from database');
+                        }
+                      },
+                    ),
+                  ),
               SizedBox(
                 height: 10,
               ),
