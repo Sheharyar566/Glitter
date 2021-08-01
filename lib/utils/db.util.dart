@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class _DBService {
@@ -44,8 +45,7 @@ class _DBService {
       final List<String> _hexValues = _box.values.toList();
 
       final List<Color> _colors = _hexValues.map<Color>((_color) {
-        final _value = 'FF${_color.substring(1)}';
-        return Color(int.parse(_value, radix: 16));
+        return hexToColor(_color);
       }).toList();
 
       return _colors;

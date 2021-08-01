@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glitter/utils/db.util.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'package:glitter/utils/themes.util.dart';
 
 enum ColorSection { Details, Controls }
@@ -44,8 +45,7 @@ class _ColorComponentState extends State<ColorComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final String hexValue =
-        '#${widget.color.value.toRadixString(16).substring(2).toUpperCase()}';
+    final String hexValue = colorToHex(widget.color);
 
     return Container(
       constraints: BoxConstraints(

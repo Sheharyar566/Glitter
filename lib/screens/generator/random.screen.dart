@@ -5,6 +5,7 @@ import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/components/color.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/utils/db.util.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'package:palette/palette.dart';
 
 class RandomScreen extends StatefulWidget {
@@ -88,8 +89,7 @@ class _RandomScreenState extends State<RandomScreen> {
                   color: color,
                   remove: () async {
                     try {
-                      await dbService.deleteColor(
-                          '#${color.value.toRadixString(16).substring(2).toUpperCase()}');
+                      await dbService.deleteColor(colorToHex(color));
                     } catch (e) {
                       print('Error occured');
                     }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/components/color.component.dart';
+import 'package:glitter/components/colorPicker.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/utils/db.util.dart';
+import 'package:glitter/utils/functions.util.dart';
 
 class FavoriteScreen extends StatefulWidget {
   @override
@@ -11,6 +13,8 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
   List<Color> _colors = [];
+  bool isPickerIntended = false;
+  late Color pickedColor;
   final ScrollController _controller = ScrollController();
 
   @override
@@ -63,10 +67,34 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
               SizedBox(
                 height: 10,
               ),
+              if (isPickerIntended)
+                CustomPicker(
+                  onSelected: (_color) async {
+                    try {
+                      await dbService.addColor(colorToHex(_color));
+                      setState(() {
+                        _colors.add(_color);
+                        isPickerIntended = false;
+                      });
+                    } catch (e) {
+                      print('Error occured while selecting a color');
+                    }
+                  },
+                ),
+              if (isPickerIntended)
+                SizedBox(
+                  height: 10,
+                ),
               Container(
                 constraints: BoxConstraints(maxHeight: 115),
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (!isPickerIntended) {
+                      setState(() {
+                        isPickerIntended = true;
+                      });
+                    }
+                  },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
