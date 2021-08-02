@@ -33,6 +33,8 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   flex_color_picker: ^2.1.2
+  palette_generator: ^0.3.0
+  image_picker: ^0.8.2
 
 dev_dependencies:
   flutter_test:
