@@ -33,15 +33,14 @@ Future<void> addPalette(Palette _palette) async {
   await dbService.addPalette(_palette);
 }
 
-Future<Uint8List> pickImage(int _) async {
+Future<Uint8List?> pickImage(int _) async {
   final ImagePicker _picker = ImagePicker();
   final XFile? _image = await _picker.pickImage(source: ImageSource.gallery);
 
   if (_image == null) {
-    throw new Exception('Got null instead of an image');
+    return null;
   }
 
   final Uint8List _imageData = await _image.readAsBytes();
-
   return _imageData;
 }

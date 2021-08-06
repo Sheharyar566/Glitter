@@ -23,7 +23,11 @@ class _ImageScreenState extends State<ImageScreen>
 
   Future<void> _pickImage(BuildContext context) async {
     try {
-      final Uint8List _imageData = await compute(pickImage, 0);
+      final Uint8List? _imageData = await compute(pickImage, 1);
+
+      if (_imageData == null) {
+        throw new Exception('Got null');
+      }
       setState(() {
         imageData = _imageData;
       });
@@ -31,7 +35,7 @@ class _ImageScreenState extends State<ImageScreen>
       print('Failed to pick image from the gallery: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(e.toString()),
+          content: Text('Failed to pick image from the gallery'),
         ),
       );
     }
