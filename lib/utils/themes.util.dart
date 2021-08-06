@@ -53,6 +53,11 @@ class Themes {
             color: _primaryColor,
           ),
         ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.all(10.0),
+          ),
+        ),
         snackBarTheme: SnackBarThemeData(
           backgroundColor: _primaryColor,
           behavior: SnackBarBehavior.floating,

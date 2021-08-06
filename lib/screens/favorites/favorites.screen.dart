@@ -25,7 +25,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
   Future<void> _loadColors() async {
     try {
-      final List<Color> _temp = await dbService.getColors();
+      final List<Color> _temp = dbService.getColors();
       setState(() {
         _colors = _temp;
       });
