@@ -89,8 +89,8 @@ class _ControlsState extends State<Controls> {
                             onPressed: () {
                               widget.togglePicker();
                             },
+                            activeColor: Colors.red,
                             icon: Icons.colorize_outlined,
-                            toolTip: 'Enable color picker',
                           ),
                           if (_palette != null)
                             CustomButton(
@@ -99,7 +99,7 @@ class _ControlsState extends State<Controls> {
                                   _showAlert = true;
                                 });
                               },
-                              toolTip: 'Add to favorite palettes',
+                              activeColor: Colors.red,
                               icon: Icons.favorite,
                             ),
                           _palette != null

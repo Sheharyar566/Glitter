@@ -3,36 +3,32 @@ import 'package:flutter/material.dart';
 class CustomButton extends StatefulWidget {
   final Function onPressed;
   final IconData icon;
-  final String toolTip;
+  final Color activeColor;
   const CustomButton({
     Key? key,
     required this.onPressed,
     required this.icon,
-    required this.toolTip,
+    required this.activeColor,
   }) : super(key: key);
 
   @override
-  _CustomButtonState createState() => _CustomButtonState();
+  CustomButtonState createState() => CustomButtonState();
 }
 
-class _CustomButtonState extends State<CustomButton> {
+class CustomButtonState extends State<CustomButton> {
   bool _isActive = false;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.circle,
-      color: _isActive ? Colors.grey : Colors.transparent,
-      child: IconButton(
-        onPressed: () {
-          widget.onPressed();
-          setState(() {
-            _isActive = !_isActive;
-          });
-        },
-        tooltip: widget.toolTip,
-        icon: Icon(widget.icon),
-      ),
+    return IconButton(
+      onPressed: () {
+        widget.onPressed();
+        setState(() {
+          _isActive = !_isActive;
+        });
+      },
+      color: _isActive ? widget.activeColor : Theme.of(context).iconTheme.color,
+      icon: Icon(widget.icon),
     );
   }
 }
