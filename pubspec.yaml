@@ -36,6 +36,8 @@ dependencies:
   palette_generator: ^0.3.0
   image_picker: ^0.8.2
   uuid: ^3.0.4
+  flutter_isolate: ^2.0.0
+  another_flushbar: ^1.10.24
 
 dev_dependencies:
   flutter_test:

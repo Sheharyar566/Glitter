@@ -1,9 +1,8 @@
+import 'dart:async';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 
 String colorToHex(Color _color) {
@@ -22,25 +21,17 @@ bool verifyPalette(Palette _palette) {
   return true;
 }
 
-Future<List<Color>> generatePallete(Uint8List _image) async {
-  final PaletteGenerator _generator =
-      await PaletteGenerator.fromImageProvider(MemoryImage(_image));
-
-  return _generator.colors.toList();
-}
-
 Future<void> addPalette(Palette _palette) async {
   await dbService.addPalette(_palette);
 }
 
-Future<Uint8List?> pickImage(int _) async {
-  final ImagePicker _picker = ImagePicker();
-  final XFile? _image = await _picker.pickImage(source: ImageSource.gallery);
+Future<List<Color>?> generatePalette(Uint8List _image) async {
+  try {
+    final PaletteGenerator _generator =
+        await PaletteGenerator.fromImageProvider(MemoryImage(_image));
 
-  if (_image == null) {
-    return null;
+    return _generator.colors.toList();
+  } catch (e) {
+    print('Error occured while generating palette in the isolate: $e');
   }
-
-  final Uint8List _imageData = await _image.readAsBytes();
-  return _imageData;
 }

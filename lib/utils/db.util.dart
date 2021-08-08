@@ -8,11 +8,19 @@ class _DBService {
   final String _paletteDB = 'favoritePalettes';
 
   Future<void> init() async {
-    await Hive.initFlutter();
-    await Hive.openBox<String>(_colorsDB);
+    try {
+      print('Initialized hive databases');
+      Hive.registerAdapter(PaletteAdapter());
 
-    Hive.registerAdapter(PaletteAdapter());
-    await Hive.openBox<Palette>(_paletteDB);
+      await Hive.initFlutter();
+      final Box<String> _colors = await Hive.openBox<String>(_colorsDB);
+      final Box<Palette> _palette = await Hive.openBox<Palette>(_paletteDB);
+
+      print(_colors);
+      print(_palette);
+    } catch (e) {
+      print('Failed to initialize the hive databases: $e');
+    }
   }
 
   List<Palette> getPalettes() {
@@ -22,7 +30,7 @@ class _DBService {
 
       return _palettes;
     } catch (e) {
-      print('Error occured while loading the colors db: $e');
+      print('Error occured while getting the palettes from db: $e');
 
       return [];
     }
@@ -38,7 +46,7 @@ class _DBService {
       final Box<Palette> _box = Hive.box<Palette>(_paletteDB);
       await _box.put(_palette.id, _palette);
     } catch (e) {
-      print('Error occured while loading the colors db: $e');
+      print('Error occured while adding the palette to palettes db: $e');
     }
   }
 
@@ -52,7 +60,7 @@ class _DBService {
       final Box<Palette> _box = Hive.box<Palette>(_paletteDB);
       await _box.put(_palette.id, _palette);
     } catch (e) {
-      print('Error occured while loading the colors db: $e');
+      print('Error occured while updating the palette in db: $e');
     }
   }
 
@@ -70,7 +78,7 @@ class _DBService {
       final Box<String> _box = Hive.box<String>(_colorsDB);
       await _box.add(_color.toUpperCase());
     } catch (e) {
-      print('Error occured while loading the colors db: $e');
+      print('Error occured while adding the color to colors db: $e');
     }
   }
 
