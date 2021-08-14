@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +12,13 @@ class Controls extends StatefulWidget {
   final Uint8List imageData;
   final Function onReset;
   final Function togglePicker;
+  final StreamController<Color?> colorStream;
   const Controls({
     Key? key,
     required this.imageData,
     required this.onReset,
     required this.togglePicker,
+    required this.colorStream,
   }) : super(key: key);
 
   @override
@@ -46,6 +49,8 @@ class _ControlsState extends State<Controls> {
         message: 'Pallete Generated!',
         duration: const Duration(seconds: 2),
         flushbarPosition: FlushbarPosition.TOP,
+        borderRadius: BorderRadius.circular(10.0),
+        margin: const EdgeInsets.all(10.0),
         backgroundColor: Themes.primaryColor,
         messageColor: Themes.textColor,
       )..show(context);
@@ -80,78 +85,136 @@ class _ControlsState extends State<Controls> {
                       });
                     },
                   ),
-                !_isLoading
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                StreamBuilder<Color?>(
+                    stream: widget.colorStream.stream,
+                    builder: (context, snapshot) {
+                      final bool isTransparent =
+                          snapshot.data == Color(0x000000FF) ||
+                              snapshot.data == Colors.white;
+                      return Flex(
+                        direction: Axis.horizontal,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        verticalDirection: VerticalDirection.down,
                         children: [
-                          CustomButton(
-                            onPressed: () {
-                              widget.togglePicker();
-                            },
-                            activeColor: Colors.red,
-                            icon: Icons.colorize_outlined,
-                          ),
-                          if (_palette != null)
-                            CustomButton(
-                              onPressed: () {
-                                setState(() {
-                                  _showAlert = true;
-                                });
-                              },
-                              activeColor: Colors.red,
-                              icon: Icons.favorite,
-                            ),
-                          _palette != null
-                              ? IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _isMaximized = !_isMaximized;
-                                    });
-                                  },
-                                  tooltip:
-                                      _isMaximized ? 'Minimize' : 'Maximize',
-                                  icon: Icon(
-                                    _isMaximized
-                                        ? Icons.minimize
-                                        : Icons.palette,
-                                  ),
-                                )
-                              : IconButton(
-                                  tooltip: 'Generate pallete',
-                                  onPressed: () {
-                                    _generateColorPalette(context);
-                                  },
-                                  icon: Icon(Icons.done),
-                                ),
-                          IconButton(
-                            tooltip: 'Reset',
-                            onPressed: () {
-                              setState(() {
-                                _isMaximized = false;
-                                _palette = null;
-                              });
+                          snapshot.data == null
+                              ? Container()
+                              : Row(
+                                  children: [
+                                    TextButton(
+                                      style: TextButton.styleFrom(
+                                        elevation: 5,
+                                        backgroundColor: isTransparent
+                                            ? Colors.white
+                                            : snapshot.data,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        fixedSize: Size.square(40),
+                                      ),
+                                      onPressed: () {
+                                        if (_palette == null) {
+                                          return;
+                                        }
 
-                              widget.onReset();
-                            },
-                            icon: Icon(Icons.close),
-                          ),
+                                        _palette?.add(snapshot.data as Color);
+
+                                        widget.colorStream.add(null);
+                                      },
+                                      child: Icon(
+                                        Icons.done,
+                                        color: isTransparent
+                                            ? Colors.black
+                                            : Colors.white,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        widget.colorStream.add(null);
+                                      },
+                                      icon: Icon(
+                                        Icons.close,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                          !_isLoading
+                              ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    if (_palette != null)
+                                      CustomButton(
+                                        onPressed: () {
+                                          widget.togglePicker();
+                                        },
+                                        activeColor: Colors.red,
+                                        icon: Icons.colorize_outlined,
+                                      ),
+                                    if (_palette != null)
+                                      CustomButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _showAlert = true;
+                                          });
+                                        },
+                                        activeColor: Colors.red,
+                                        icon: Icons.favorite,
+                                      ),
+                                    _palette != null
+                                        ? IconButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _isMaximized = !_isMaximized;
+                                              });
+                                            },
+                                            tooltip: _isMaximized
+                                                ? 'Minimize'
+                                                : 'Maximize',
+                                            icon: Icon(
+                                              _isMaximized
+                                                  ? Icons.minimize
+                                                  : Icons.palette,
+                                            ),
+                                          )
+                                        : IconButton(
+                                            tooltip: 'Generate pallete',
+                                            onPressed: () {
+                                              _generateColorPalette(context);
+                                            },
+                                            icon: Icon(Icons.done),
+                                          ),
+                                    IconButton(
+                                      tooltip: 'Reset',
+                                      onPressed: () {
+                                        setState(() {
+                                          _isMaximized = false;
+                                          _palette = null;
+                                        });
+
+                                        widget.onReset();
+                                      },
+                                      icon: Icon(Icons.close),
+                                    ),
+                                  ],
+                                )
+                              : Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: SizedBox(
+                                      width: 22.5,
+                                      height: 22.5,
+                                      child: CircularProgressIndicator(
+                                        color: Themes.primaryColor,
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                         ],
-                      )
-                    : Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: SizedBox(
-                            width: 22.5,
-                            height: 22.5,
-                            child: CircularProgressIndicator(
-                              color: Themes.primaryColor,
-                              strokeWidth: 3,
-                            ),
-                          ),
-                        ),
-                      ),
+                      );
+                    }),
                 if (_isMaximized)
                   Expanded(
                     child: SingleChildScrollView(

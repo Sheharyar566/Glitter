@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 
 String colorToHex(Color _color) {
@@ -25,13 +26,18 @@ Future<void> addPalette(Palette _palette) async {
   await dbService.addPalette(_palette);
 }
 
-Future<List<Color>?> generatePalette(Uint8List _image) async {
+Future<Uint8List> loadImageData(XFile _image) async {
   try {
-    final PaletteGenerator _generator =
-        await PaletteGenerator.fromImageProvider(MemoryImage(_image));
-
-    return _generator.colors.toList();
+    final Uint8List _data = await _image.readAsBytes();
+    return _data;
   } catch (e) {
-    print('Error occured while generating palette in the isolate: $e');
+    print('Failed to convert image to bytes: $e');
+    throw e;
   }
+}
+
+int abgrToArgb(int argbColor) {
+  int r = (argbColor >> 16) & 0xFF;
+  int b = argbColor & 0xFF;
+  return (argbColor & 0xFF00FF00) | (b << 16) | r;
 }

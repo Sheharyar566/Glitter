@@ -6,6 +6,8 @@ import 'package:glitter/screens/image/components/controls.component.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/screens/image/components/image.component.dart';
+import 'package:glitter/screens/image/components/magnifier.component.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageScreen extends StatefulWidget {
@@ -17,18 +19,47 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   Uint8List? _imageData;
+  StreamController<Offset?>? _positionStream;
+  StreamController<Color?>? _colorStream;
   bool _isPickerEnabled = false;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    clearStreams();
+    super.dispose();
+  }
+
+  void initStreams() {
+    _positionStream = StreamController();
+    _colorStream = StreamController();
+  }
+
+  void clearStreams() {
+    _positionStream?.close();
+    _colorStream?.close();
+
+    _positionStream = null;
+    _colorStream = null;
+  }
 
   Future<void> _pickImage(BuildContext context) async {
     try {
+      initStreams();
+
       final ImagePicker _picker = ImagePicker();
       final XFile? _image =
           await _picker.pickImage(source: ImageSource.gallery);
 
       if (_image != null) {
-        final Uint8List _temp = await _image.readAsBytes();
+        setState(() {
+          _isLoading = true;
+        });
+
+        final Uint8List _temp = await compute(loadImageData, _image);
 
         setState(() {
+          _isLoading = false;
           _imageData = _temp;
         });
       } else {
@@ -50,6 +81,14 @@ class _ImageScreenState extends State<ImageScreen> {
     });
   }
 
+  void reset() {
+    setState(() {
+      _imageData = null;
+    });
+
+    clearStreams();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,39 +96,59 @@ class _ImageScreenState extends State<ImageScreen> {
         context,
         'Image Palette',
       ),
-      body: _imageData == null
+      body: _isLoading == true
           ? Center(
-              child: Ink.image(
-                image: AssetImage(
-                  'assets/icons/image.png',
-                ),
-                width: 100,
-                height: 100,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20.0),
-                  onTap: () {
-                    _pickImage(context);
-                  },
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  ),
                 ),
               ),
             )
-          : Stack(
-              children: [
-                ImageViewer(
-                    imageData: _imageData as Uint8List,
-                    isPickerEnabled: _isPickerEnabled),
-                if (_imageData != null)
-                  Controls(
-                    imageData: _imageData as Uint8List,
-                    onReset: () {
-                      setState(() {
-                        _imageData = null;
-                      });
-                    },
-                    togglePicker: togglePicker,
+          : _imageData == null
+              ? Center(
+                  child: Ink.image(
+                    image: AssetImage(
+                      'assets/icons/image.png',
+                    ),
+                    width: 100,
+                    height: 100,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20.0),
+                      onTap: () {
+                        _pickImage(context);
+                      },
+                    ),
                   ),
-              ],
-            ),
+                )
+              : Stack(
+                  children: [
+                    ImageViewer(
+                      imageData: _imageData as Uint8List,
+                      isPickerEnabled: _isPickerEnabled,
+                      positionStream:
+                          _positionStream as StreamController<Offset?>,
+                      colorStream: _colorStream as StreamController<Color?>,
+                    ),
+                    Magnifier(
+                      positionStream:
+                          _positionStream as StreamController<Offset?>,
+                    ),
+                    if (_imageData != null)
+                      Controls(
+                        imageData: _imageData as Uint8List,
+                        onReset: reset,
+                        togglePicker: togglePicker,
+                        colorStream: _colorStream as StreamController<Color?>,
+                      ),
+                  ],
+                ),
     );
   }
 }

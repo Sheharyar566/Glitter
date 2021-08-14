@@ -1,73 +1,73 @@
+import 'dart:async';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
-class Magnifier extends StatefulWidget {
-  final Offset position;
-  const Magnifier({Key? key, required this.position}) : super(key: key);
+class Magnifier extends StatelessWidget {
+  final StreamController<Offset?> positionStream;
+  const Magnifier({Key? key, required this.positionStream}) : super(key: key);
 
-  @override
-  _MagnifierState createState() => _MagnifierState();
-}
-
-class _MagnifierState extends State<Magnifier> {
-  final double _size = 50;
+  final double _size = 135;
   final double _scale = 10;
-  late Matrix4 _matrix4;
 
-  void _updateMatrix() {
-    final double x = widget.position.dx - (_size / 2);
-    final double y = widget.position.dy - (_size / 2);
+  Matrix4 _updateMatrix(Offset position) {
+    final double x = position.dx;
+    final double y = position.dy + (_size * 2 / _scale);
 
     final Matrix4 _tempMatrix = Matrix4.identity()
       ..scale(_scale, _scale)
       ..translate(-x, -y);
 
-    setState(() {
-      _matrix4 = _tempMatrix;
-    });
+    return _tempMatrix;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: ClipOval(
-        child: BackdropFilter(
-          filter: ImageFilter.matrix(_matrix4.storage),
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              shape: BoxShape.circle,
-              border: Border.all(
-                width: 2,
-                color: Colors.blue,
+    return StreamBuilder<Offset?>(
+        stream: positionStream.stream,
+        builder: (context, snapshot) {
+          final Offset? _position = snapshot.data;
+
+          if (_position == null) {
+            return Container();
+          }
+
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ClipOval(
+                child: BackdropFilter(
+                  filter: ImageFilter.matrix(_updateMatrix(_position).storage),
+                  child: CustomPaint(
+                    painter: MagnifierCircle(),
+                    size: Size(_size, _size),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+        });
   }
 }
 
 class MagnifierCircle extends CustomPainter {
-  final Color _color = Color(0xFF777777);
-  final double _strokeWidth = 4;
+  final Color _color = Color(0xFF888888);
+  final double _strokeWidth = 2;
   final double _gridLines = 6;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final double _gridItemSize =
+        (size.height - (_gridLines * _strokeWidth)) / (_gridLines + 1);
+
     _drawCircle(canvas, size);
-    _drawGrid(canvas, size);
-    _drawBox(canvas, size);
+    _drawGrid(canvas, size, _gridItemSize);
+    _drawBox(canvas, size, _gridItemSize);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+    return false;
   }
 
   void _drawCircle(Canvas canvas, Size size) {
@@ -83,30 +83,39 @@ class MagnifierCircle extends CustomPainter {
     );
   }
 
-  void _drawGrid(Canvas canvas, Size size) {
+  void _drawGrid(Canvas canvas, Size size, double _gridItemSize) {
     final Paint _paint = Paint()
       ..strokeWidth = _strokeWidth / 2
       ..color = _color;
 
-    final double _gridItemHeight = (size.height / _gridLines) - _strokeWidth;
-    final double _gridItemWidth = (size.width / _gridLines) - _strokeWidth;
-
     for (int i = 1; i <= _gridLines; i++) {
-      canvas.drawLine(Offset(0, _gridItemHeight * i),
-          Offset(size.width, _gridItemHeight * i), _paint);
+      final double _spacing = (_gridItemSize * i) +
+          (_strokeWidth / 2) +
+          (i >= 2 ? (i - 1) * _strokeWidth : 0);
 
-      canvas.drawLine(Offset(_gridItemWidth * i, 0),
-          Offset(_gridItemWidth * i, size.height), _paint);
+      canvas.drawLine(
+          Offset(0, _spacing), Offset(size.width, _spacing), _paint);
+
+      canvas.drawLine(
+          Offset(_spacing, 0), Offset(_spacing, size.height), _paint);
     }
   }
 
-  void _drawBox(Canvas canvas, Size size) {
+  void _drawBox(Canvas canvas, Size size, double _gridItemSize) {
     final Paint _paint = Paint()
+      ..style = PaintingStyle.stroke
       ..strokeWidth = _strokeWidth / 2
       ..color = Colors.red;
 
     canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(20, 40, 100, 100), Radius.zero),
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(
+          center: size.center(Offset(0, 0)),
+          width: _gridItemSize,
+          height: _gridItemSize,
+        ),
+        Radius.zero,
+      ),
       _paint,
     );
   }
