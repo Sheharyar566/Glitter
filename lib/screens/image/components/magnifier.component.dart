@@ -36,13 +36,13 @@ class Magnifier extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ClipOval(
-                child: BackdropFilter(
-                  filter: ImageFilter.matrix(_updateMatrix(_position).storage),
-                  child: CustomPaint(
-                    painter: MagnifierCircle(),
-                    size: Size(_size, _size),
-                  ),
+                // child: BackdropFilter(
+                //   filter: ImageFilter.matrix(_updateMatrix(_position).storage),
+                child: CustomPaint(
+                  painter: MagnifierCircle(),
+                  size: Size(_size, _size),
                 ),
+                // ),
               ),
             ),
           );

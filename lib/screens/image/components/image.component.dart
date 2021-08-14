@@ -26,12 +26,27 @@ class ImageViewer extends StatefulWidget {
 class _ImageViewerState extends State<ImageViewer> {
   final GlobalKey _imageKey = GlobalKey();
   img.Image? _image;
+  int? _scale;
 
   void loadImageData() {
     final img.Image? _temp =
         img.decodeImage(widget.imageData.buffer.asUint8List());
 
     _image = _temp;
+  }
+
+  void getScaleValue() {
+    final Size? _size = _imageKey.currentContext?.size;
+
+    if (_size == null) {
+      return;
+    }
+
+    final double _temp = _image!.width / _size.width;
+
+    print(_temp);
+    print(_temp.toInt());
+    _scale = _temp.toInt();
   }
 
   void showMagnifier(DragDownDetails value) {
@@ -67,12 +82,13 @@ class _ImageViewerState extends State<ImageViewer> {
       loadImageData();
     }
 
-    if (_image == null) {
-      return;
+    if (_scale == null) {
+      getScaleValue();
     }
 
-    final int _pixel =
-        _image!.getPixelSafe(_position.dx.toInt(), _position.dy.toInt());
+    final int _pixel = _image!.getPixelSafe(
+        _position.dx.toInt() * (_scale as int),
+        _position.dy.toInt() * (_scale as int));
     final int _hex = abgrToArgb(_pixel);
 
     widget.colorStream.add(hexToColor(_hex.toRadixString(16)));

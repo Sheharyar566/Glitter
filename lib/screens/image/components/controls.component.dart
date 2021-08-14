@@ -80,6 +80,7 @@ class _ControlsState extends State<Controls> {
                   FavoriteAlert(
                     palette: _palette,
                     onDone: () {
+                      print('Hide dialog!');
                       setState(() {
                         _showAlert = false;
                       });

@@ -54,12 +54,14 @@ class _FavoriteAlertState extends State<FavoriteAlert> {
                   child: Text('Cancel'),
                   onPressed: () {
                     widget.onDone();
+                    Navigator.of(context).pop();
                   },
                 ),
                 TextButton(
                   child: Text('Add to Favorites'),
                   onPressed: () async {
                     this._addToFavorites(context);
+                    Navigator.of(context).pop();
                   },
                 ),
               ],

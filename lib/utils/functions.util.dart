@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 String colorToHex(Color _color) {
   return '#${_color.value.toRadixString(16).substring(2).toUpperCase()}';
