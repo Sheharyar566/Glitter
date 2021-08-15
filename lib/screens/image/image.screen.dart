@@ -45,21 +45,27 @@ class _ImageScreenState extends State<ImageScreen> {
 
   Future<void> _pickImage(BuildContext context) async {
     try {
+      print('Initializing streams');
       initStreams();
 
+      print('Picking image');
       final ImagePicker _picker = ImagePicker();
       final XFile? _image =
           await _picker.pickImage(source: ImageSource.gallery);
 
+      print('Image selected');
       if (_image != null) {
         setState(() {
           _isLoading = true;
         });
 
+        print('Converting to list');
+
         final Uint8List _temp = await compute(loadImageData, _image);
 
+        print('Got list');
+
         setState(() {
-          _isLoading = false;
           _imageData = _temp;
         });
       } else {
@@ -96,59 +102,70 @@ class _ImageScreenState extends State<ImageScreen> {
         context,
         'Image Palette',
       ),
-      body: _isLoading == true
+      body: _imageData == null
           ? Center(
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
-                  ),
+              child: Ink.image(
+                image: AssetImage(
+                  'assets/icons/image.png',
+                ),
+                width: 100,
+                height: 100,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20.0),
+                  onTap: () {
+                    _pickImage(context);
+                  },
                 ),
               ),
             )
-          : _imageData == null
-              ? Center(
-                  child: Ink.image(
-                    image: AssetImage(
-                      'assets/icons/image.png',
-                    ),
-                    width: 100,
-                    height: 100,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20.0),
-                      onTap: () {
-                        _pickImage(context);
-                      },
-                    ),
-                  ),
-                )
-              : Stack(
-                  children: [
-                    ImageViewer(
-                      imageData: _imageData as Uint8List,
-                      isPickerEnabled: _isPickerEnabled,
-                      positionStream:
-                          _positionStream as StreamController<Offset?>,
-                      colorStream: _colorStream as StreamController<Color?>,
-                    ),
-                    Magnifier(
-                      positionStream:
-                          _positionStream as StreamController<Offset?>,
-                    ),
-                    if (_imageData != null)
-                      Controls(
-                        imageData: _imageData as Uint8List,
-                        onReset: reset,
-                        togglePicker: togglePicker,
-                        colorStream: _colorStream as StreamController<Color?>,
-                      ),
-                  ],
+          : Stack(
+              children: [
+                ImageViewer(
+                  imageData: _imageData as Uint8List,
+                  isPickerEnabled: _isPickerEnabled,
+                  onLoadComplete: () {
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  },
+                  positionStream: _positionStream as StreamController<Offset?>,
+                  colorStream: _colorStream as StreamController<Color?>,
                 ),
+                Magnifier(
+                  positionStream: _positionStream as StreamController<Offset?>,
+                ),
+                if (_imageData != null)
+                  Controls(
+                    imageData: _imageData as Uint8List,
+                    onReset: reset,
+                    togglePicker: togglePicker,
+                    colorStream: _colorStream as StreamController<Color?>,
+                  ),
+                if (_isLoading)
+                  Container(
+                    height: double.maxFinite,
+                    width: double.maxFinite,
+                    color: Colors.grey.withOpacity(0.7),
+                    child: Center(
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+              ],
+            ),
     );
   }
 }

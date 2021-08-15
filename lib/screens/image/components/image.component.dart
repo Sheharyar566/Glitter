@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:glitter/utils/functions.util.dart';
@@ -8,6 +9,7 @@ import 'package:image/image.dart' as img;
 class ImageViewer extends StatefulWidget {
   final Uint8List imageData;
   final bool isPickerEnabled;
+  final Function onLoadComplete;
   final StreamController<Offset?> positionStream;
   final StreamController<Color?> colorStream;
 
@@ -15,6 +17,7 @@ class ImageViewer extends StatefulWidget {
       {Key? key,
       required this.imageData,
       required this.isPickerEnabled,
+      required this.onLoadComplete,
       required this.positionStream,
       required this.colorStream})
       : super(key: key);
@@ -25,28 +28,36 @@ class ImageViewer extends StatefulWidget {
 
 class _ImageViewerState extends State<ImageViewer> {
   final GlobalKey _imageKey = GlobalKey();
-  img.Image? _image;
-  int? _scale;
+  late img.Image _image;
+  late double _hScale;
+  late double _vScale;
 
-  void loadImageData() {
-    final img.Image? _temp =
-        img.decodeImage(widget.imageData.buffer.asUint8List());
-
-    _image = _temp;
+  @override
+  void initState() {
+    loadImageData();
+    super.initState();
   }
 
-  void getScaleValue() {
+  void loadImageData() async {
+    final img.Image? _tempImage =
+        await compute(decodeImageData, widget.imageData);
+
+    if (_tempImage == null) {
+      return;
+    }
+
+    _image = _tempImage;
+
     final Size? _size = _imageKey.currentContext?.size;
 
     if (_size == null) {
       return;
     }
 
-    final double _temp = _image!.width / _size.width;
+    _hScale = _image.width / _size.width;
+    _vScale = _image.height / _size.height;
 
-    print(_temp);
-    print(_temp.toInt());
-    _scale = _temp.toInt();
+    widget.onLoadComplete();
   }
 
   void showMagnifier(DragDownDetails value) {
@@ -78,17 +89,9 @@ class _ImageViewerState extends State<ImageViewer> {
   void update(Offset _position) {
     widget.positionStream.add(_position);
 
-    if (_image == null) {
-      loadImageData();
-    }
+    final Offset _temp = Offset(_position.dx * _hScale, _position.dy * _vScale);
 
-    if (_scale == null) {
-      getScaleValue();
-    }
-
-    final int _pixel = _image!.getPixelSafe(
-        _position.dx.toInt() * (_scale as int),
-        _position.dy.toInt() * (_scale as int));
+    final int _pixel = _image.getPixelSafe(_temp.dx.round(), _temp.dy.round());
     final int _hex = abgrToArgb(_pixel);
 
     widget.colorStream.add(hexToColor(_hex.toRadixString(16)));

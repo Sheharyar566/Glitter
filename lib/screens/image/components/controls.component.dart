@@ -67,7 +67,7 @@ class _ControlsState extends State<Controls> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Card(
           elevation: 5,
           margin: const EdgeInsets.all(0),
@@ -118,7 +118,8 @@ class _ControlsState extends State<Controls> {
                                           return;
                                         }
 
-                                        _palette?.add(snapshot.data as Color);
+                                        _palette?.insert(
+                                            0, snapshot.data as Color);
 
                                         widget.colorStream.add(null);
                                       },

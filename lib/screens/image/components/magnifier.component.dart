@@ -7,11 +7,11 @@ class Magnifier extends StatelessWidget {
   const Magnifier({Key? key, required this.positionStream}) : super(key: key);
 
   final double _size = 135;
-  final double _scale = 10;
+  final double _scale = 1;
 
   Matrix4 _updateMatrix(Offset position) {
-    final double x = position.dx;
-    final double y = position.dy + (_size * 2 / _scale);
+    final double x = position.dx - (_size / (2 * _scale)) - 5;
+    final double y = (position.dy * _scale) + (_size / _scale) - 12;
 
     final Matrix4 _tempMatrix = Matrix4.identity()
       ..scale(_scale, _scale)
@@ -23,37 +23,39 @@ class Magnifier extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Offset?>(
-        stream: positionStream.stream,
-        builder: (context, snapshot) {
-          final Offset? _position = snapshot.data;
+      stream: positionStream.stream,
+      builder: (context, snapshot) {
+        final Offset? _position = snapshot.data;
 
-          if (_position == null) {
-            return Container();
-          }
+        if (_position == null) {
+          return Container();
+        }
 
-          return Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ClipOval(
-                // child: BackdropFilter(
-                //   filter: ImageFilter.matrix(_updateMatrix(_position).storage),
+        return Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.matrix(_updateMatrix(_position).storage),
                 child: CustomPaint(
                   painter: MagnifierCircle(),
                   size: Size(_size, _size),
                 ),
-                // ),
               ),
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
 
 class MagnifierCircle extends CustomPainter {
   final Color _color = Color(0xFF888888);
   final double _strokeWidth = 2;
-  final double _gridLines = 6;
+  final int _gridLines = 6;
+  final double _dotSize = 2;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -62,7 +64,7 @@ class MagnifierCircle extends CustomPainter {
 
     _drawCircle(canvas, size);
     _drawGrid(canvas, size, _gridItemSize);
-    _drawBox(canvas, size, _gridItemSize);
+    _drawBox(canvas, size);
   }
 
   @override
@@ -101,22 +103,12 @@ class MagnifierCircle extends CustomPainter {
     }
   }
 
-  void _drawBox(Canvas canvas, Size size, double _gridItemSize) {
+  void _drawBox(Canvas canvas, Size size) {
     final Paint _paint = Paint()
-      ..style = PaintingStyle.stroke
+      ..style = PaintingStyle.fill
       ..strokeWidth = _strokeWidth / 2
-      ..color = Colors.red;
+      ..color = Colors.white;
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromCenter(
-          center: size.center(Offset(0, 0)),
-          width: _gridItemSize,
-          height: _gridItemSize,
-        ),
-        Radius.zero,
-      ),
-      _paint,
-    );
+    canvas.drawCircle(size.center(Offset(0, 0)), _dotSize, _paint);
   }
 }

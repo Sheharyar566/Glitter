@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
 
 String colorToHex(Color _color) {
   return '#${_color.value.toRadixString(16).substring(2).toUpperCase()}';
@@ -29,6 +30,17 @@ Future<Uint8List> loadImageData(XFile _image) async {
   try {
     final Uint8List _data = await _image.readAsBytes();
     return _data;
+  } catch (e) {
+    print('Failed to convert image to bytes: $e');
+    throw e;
+  }
+}
+
+Future<img.Image?> decodeImageData(Uint8List _image) async {
+  try {
+    final img.Image? _tempImage = img.decodeImage(_image.buffer.asUint8List());
+
+    return _tempImage;
   } catch (e) {
     print('Failed to convert image to bytes: $e');
     throw e;
