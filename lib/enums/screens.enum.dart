@@ -5,4 +5,5 @@ class Screen {
   static String get collections => '/collection';
   static String get image => '/image';
   static String get generator => '/generator';
+  static String get editor => '/generator';
 }

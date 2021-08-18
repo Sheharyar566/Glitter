@@ -37,7 +37,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(context, 'Favorite Colors'),
+      appBar: CustomAppBar(context: context, titleText: 'Favorite Colors'),
       drawer: CustomDrawer(context),
       body: SingleChildScrollView(
         controller: _controller,

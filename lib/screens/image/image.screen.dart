@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/screens/image/components/controls.component.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
@@ -98,9 +99,10 @@ class _ImageScreenState extends State<ImageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(context),
       appBar: CustomAppBar(
-        context,
-        'Image Palette',
+        context: context,
+        titleText: 'Image Palette',
       ),
       body: _imageData == null
           ? Center(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/functions.util.dart';
@@ -6,6 +7,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 class _DBService {
   final String _colorsDB = 'favoriteColors';
   final String _paletteDB = 'favoritePalettes';
+  final String _settingsDB = 'settings';
+
+  final String _darkMode = 'Dark Mode';
 
   Future<void> init() async {
     try {
@@ -15,9 +19,11 @@ class _DBService {
       await Hive.initFlutter();
       final Box<String> _colors = await Hive.openBox<String>(_colorsDB);
       final Box<Palette> _palette = await Hive.openBox<Palette>(_paletteDB);
+      final Box<dynamic> _settings = await Hive.openBox<dynamic>(_settingsDB);
 
       print(_colors);
       print(_palette);
+      print(_settings);
     } catch (e) {
       print('Failed to initialize the hive databases: $e');
     }
@@ -115,6 +121,17 @@ class _DBService {
     } catch (e) {
       return [];
     }
+  }
+
+  // Settings setters and getters
+  ValueListenable<Box<dynamic>> get darkModeListenable =>
+      Hive.box<dynamic>(_settingsDB).listenable(keys: [_darkMode]);
+
+  bool get darkMode =>
+      Hive.box(_settingsDB).get(_darkMode, defaultValue: false);
+
+  set darkMode(bool _value) {
+    Hive.box(_settingsDB).put(_darkMode, _value);
   }
 }
 

@@ -22,6 +22,8 @@ class Themes {
           backgroundColor: _boxBackground,
           unselectedItemColor: _disabledColor,
           selectedItemColor: _primaryColor,
+          showUnselectedLabels: false,
+          showSelectedLabels: false,
           elevation: 2.0,
           unselectedLabelStyle: TextStyle(
             color: _disabledColor,

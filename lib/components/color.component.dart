@@ -10,11 +10,16 @@ enum ColorSection { Details, Controls }
 class ColorComponent extends StatefulWidget {
   final Color color;
   final bool? favorite;
+  final bool? showDelete;
   final void Function() remove;
 
-  const ColorComponent(
-      {Key? key, required this.color, required this.remove, this.favorite})
-      : super(key: key);
+  const ColorComponent({
+    Key? key,
+    required this.color,
+    required this.remove,
+    this.favorite,
+    this.showDelete,
+  }) : super(key: key);
 
   @override
   _ColorComponentState createState() => _ColorComponentState();
@@ -120,17 +125,18 @@ class _ColorComponentState extends State<ColorComponent> {
                               onPressed: () async {
                                 try {
                                   if (isFavorite) {
-                                    // await dbService.deleteColor(hexValue);
-
                                     if (widget.favorite != null)
                                       widget.remove();
+
+                                    setState(() {
+                                      isFavorite = false;
+                                    });
                                   } else {
                                     await dbService.addColor(hexValue);
+                                    setState(() {
+                                      isFavorite = true;
+                                    });
                                   }
-
-                                  setState(() {
-                                    isFavorite = !isFavorite;
-                                  });
                                 } catch (e) {}
                               },
                               tooltip: isFavorite

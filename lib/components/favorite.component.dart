@@ -5,7 +5,7 @@ import 'package:glitter/utils/functions.util.dart';
 
 class FavoriteAlert extends StatefulWidget {
   final List<Color>? palette;
-  final Function onDone;
+  final Function(bool wasFavorited) onDone;
   const FavoriteAlert({Key? key, required this.palette, required this.onDone})
       : super(key: key);
 
@@ -53,7 +53,7 @@ class _FavoriteAlertState extends State<FavoriteAlert> {
                 TextButton(
                   child: Text('Cancel'),
                   onPressed: () {
-                    widget.onDone();
+                    widget.onDone(false);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -90,7 +90,7 @@ class _FavoriteAlertState extends State<FavoriteAlert> {
         name = '';
       });
 
-      widget.onDone();
+      widget.onDone(true);
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Palette added to favorites!'),

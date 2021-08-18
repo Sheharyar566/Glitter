@@ -4,7 +4,15 @@ import 'package:glitter/enums/screens.enum.dart';
 class CustomAppBar extends AppBar {
   final BuildContext context;
   final String titleText;
-  CustomAppBar(this.context, this.titleText);
+  final List<Widget>? actionsList;
+  CustomAppBar({
+    required this.context,
+    required this.titleText,
+    this.actionsList,
+  });
+
+  @override
+  double? get leadingWidth => 40;
 
   @override
   Widget? get title => Row(
@@ -31,10 +39,13 @@ class CustomAppBar extends AppBar {
             if (Navigator.canPop(context)) {
               Navigator.popUntil(
                 context,
-                ModalRoute.withName(Screen.generator),
+                ModalRoute.withName(Screen.home),
               );
             }
           },
         )
       : null;
+
+  @override
+  List<Widget>? get actions => this.actionsList;
 }

@@ -4,7 +4,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/color.component.dart';
 import 'package:glitter/screens/image/components/button.component.dart';
-import 'package:glitter/screens/image/components/favorite.component.dart';
+import 'package:glitter/components/favorite.component.dart';
 import 'package:glitter/utils/themes.util.dart';
 import 'package:palette_generator/palette_generator.dart';
 
@@ -79,8 +79,7 @@ class _ControlsState extends State<Controls> {
                 if (_showAlert)
                   FavoriteAlert(
                     palette: _palette,
-                    onDone: () {
-                      print('Hide dialog!');
+                    onDone: (bool _) {
                       setState(() {
                         _showAlert = false;
                       });

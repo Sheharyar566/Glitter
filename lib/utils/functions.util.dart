@@ -11,7 +11,9 @@ String colorToHex(Color _color) {
 }
 
 Color hexToColor(String _color) {
-  return Color(int.parse('FF${_color.substring(1)}', radix: 16));
+  return Color(
+      int.parse(_color.substring(1, _color.length > 7 ? 7 : null), radix: 16) +
+          0xFF000000);
 }
 
 bool verifyPalette(Palette _palette) {
