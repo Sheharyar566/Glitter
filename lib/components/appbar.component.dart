@@ -21,8 +21,8 @@ class CustomAppBar extends AppBar {
           Image.asset(
             'assets/icons/icon.png',
             fit: BoxFit.contain,
-            width: 25,
-            height: 25,
+            width: 30,
+            height: 30,
           ),
           SizedBox(
             width: 10,

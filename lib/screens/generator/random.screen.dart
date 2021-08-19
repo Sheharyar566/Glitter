@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
@@ -5,9 +6,11 @@ import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/components/color.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/components/favorite.component.dart';
+import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/functions.util.dart';
 import 'package:palette/palette.dart';
+import 'package:uuid/uuid.dart';
 
 class RandomScreen extends StatefulWidget {
   @override
@@ -20,11 +23,12 @@ class _RandomScreenState extends State<RandomScreen> {
   bool _showDialog = false;
   bool _isFavorite = false;
 
-  final ScrollController _controller = ScrollController();
+  late final ScrollController _controller;
 
   @override
   void initState() {
     super.initState();
+    _controller = ScrollController();
     this.generatePalette();
   }
 
@@ -35,8 +39,8 @@ class _RandomScreenState extends State<RandomScreen> {
   }
 
   void generatePalette() {
-    ColorPalette _palette = ColorPalette.random(_count, unique: true);
-    List<Color> _temp = _palette.map((color) {
+    final ColorPalette _palette = ColorPalette.random(_count, unique: true);
+    final List<Color> _temp = _palette.map((color) {
       int red = color.toRgbColor().red;
       int green = color.toRgbColor().green;
       int blue = color.toRgbColor().blue;
@@ -54,24 +58,66 @@ class _RandomScreenState extends State<RandomScreen> {
   }
 
   void addColor() {
-    ColorPalette _temp = ColorPalette.random(1);
-    RgbColor _color = _temp.colors[0].toRgbColor();
+    final ColorPalette _temp = ColorPalette.random(1);
+    final RgbColor _rgbColor = _temp.colors[0].toRgbColor();
+    final Color _color =
+        Color.fromRGBO(_rgbColor.red, _rgbColor.green, _rgbColor.blue, 1);
 
+    final bool _isAlreadyPresent =
+        _colors.where((element) => element.value == _color.value).length > 0;
+
+    if (!_isAlreadyPresent) {
+      setState(() {
+        _colors.add(_color);
+
+        _count = _count + 1;
+      });
+
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        _controller.animateTo(
+          _controller.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      });
+    } else {
+      addColor();
+    }
+  }
+
+  Future<void> _onFavorited(BuildContext context, String _name) async {
     setState(() {
-      _colors.add(
-        Color.fromRGBO(_color.red, _color.green, _color.blue, 1),
-      );
-
-      _count = _count + 1;
+      _showDialog = false;
     });
 
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      _controller.animateTo(
-        _controller.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+    if (!_isFavorite) {
+      try {
+        await compute(
+          addPalette,
+          Palette(
+            id: Uuid().v4(),
+            name: _name,
+            colors: _colors.map((e) => colorToHex(e)).toList(),
+          ),
+        );
+
+        setState(() {
+          _isFavorite = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Palette added to favorites!'),
+        ));
+      } catch (e) {
+        print('Error occured while adding a random palette to db: $e');
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Palette already in favorites'),
+        ),
       );
-    });
+    }
   }
 
   @override
@@ -156,14 +202,13 @@ class _RandomScreenState extends State<RandomScreen> {
           ),
           if (_showDialog)
             FavoriteAlert(
-              onFavorited: (String _name) {
+              onCancelled: () {
                 setState(() {
                   _showDialog = false;
-
-                  // if (wasFavorited) {
-                  //   _isFavorite = true;
-                  // }
                 });
+              },
+              onFavorited: (String _name) {
+                _onFavorited(context, _name);
               },
             ),
         ],

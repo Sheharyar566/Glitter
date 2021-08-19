@@ -8,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/screens/image/components/image.component.dart';
 import 'package:glitter/screens/image/components/magnifier.component.dart';
+import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/functions.util.dart';
+import 'package:glitter/utils/themes.util.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageScreen extends StatefulWidget {
@@ -106,17 +108,27 @@ class _ImageScreenState extends State<ImageScreen> {
       ),
       body: _imageData == null
           ? Center(
-              child: Ink.image(
-                image: AssetImage(
-                  'assets/icons/image.png',
-                ),
-                width: 100,
-                height: 100,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(20.0),
-                  onTap: () {
+              child: SizedBox.fromSize(
+                size: Size.square(100),
+                child: MaterialButton(
+                  onPressed: () {
                     _pickImage(context);
                   },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    side: BorderSide(
+                      color: dbService.darkMode
+                          ? Themes.darkPrimaryColor
+                          : Themes.primaryColor,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.image_rounded,
+                    size: 70,
+                    color: dbService.darkMode
+                        ? Themes.darkPrimaryColor
+                        : Themes.primaryColor,
+                  ),
                 ),
               ),
             )
@@ -147,7 +159,7 @@ class _ImageScreenState extends State<ImageScreen> {
                   Container(
                     height: double.maxFinite,
                     width: double.maxFinite,
-                    color: Colors.grey.withOpacity(0.7),
+                    color: Colors.black87.withOpacity(0.7),
                     child: Center(
                       child: Card(
                         shape: RoundedRectangleBorder(
@@ -159,6 +171,9 @@ class _ImageScreenState extends State<ImageScreen> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
+                              color: dbService.darkMode
+                                  ? Themes.darkPrimaryColor
+                                  : Themes.primaryColor,
                               strokeWidth: 2,
                             ),
                           ),

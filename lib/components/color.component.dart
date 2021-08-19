@@ -153,7 +153,9 @@ class _ColorComponentState extends State<ColorComponent> {
                                     : Icons.favorite_outline_rounded,
                                 color: isFavorite
                                     ? Colors.red
-                                    : Themes.primaryColor,
+                                    : dbService.darkMode
+                                        ? Themes.darkPrimaryColor
+                                        : Themes.primaryColor,
                               ),
                             ),
                           ],
@@ -165,7 +167,9 @@ class _ColorComponentState extends State<ColorComponent> {
               ),
             ),
             Material(
-              color: Themes.boxBackground.withOpacity(0.95),
+              color: dbService.darkMode
+                  ? Themes.darkBackground
+                  : Themes.boxBackground.withOpacity(0.95),
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Flex(

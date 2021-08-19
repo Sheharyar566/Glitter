@@ -20,7 +20,7 @@ class Glitter extends StatelessWidget {
       builder: (context, _, child) {
         return MaterialApp(
           theme: Themes.lightTheme,
-          darkTheme: ThemeData.dark(),
+          darkTheme: Themes.darkTheme,
           themeMode: dbService.darkMode ? ThemeMode.dark : ThemeMode.system,
           debugShowCheckedModeBanner: false,
           routes: {

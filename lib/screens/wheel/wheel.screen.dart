@@ -28,7 +28,10 @@ class WheelScreen extends StatelessWidget {
               SizedBox(
                 height: 10,
               ),
-              Text('Coming Soon'),
+              Text(
+                'Coming Soon',
+                style: Theme.of(context).primaryTextTheme.bodyText2,
+              ),
             ],
           ),
         ),

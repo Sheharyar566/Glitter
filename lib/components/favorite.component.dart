@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 
 class FavoriteAlert extends StatefulWidget {
   final void Function(String name) onFavorited;
+  final void Function() onCancelled;
   final String? name;
-  const FavoriteAlert({Key? key, required this.onFavorited, this.name})
+  const FavoriteAlert(
+      {Key? key,
+      required this.onCancelled,
+      required this.onFavorited,
+      this.name})
       : super(key: key);
 
   @override
@@ -22,6 +27,7 @@ class _FavoriteAlertState extends State<FavoriteAlert> {
 
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       showDialog(
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -47,6 +53,7 @@ class _FavoriteAlertState extends State<FavoriteAlert> {
               TextButton(
                 child: Text('Cancel'),
                 onPressed: () {
+                  widget.onCancelled();
                   Navigator.of(context).pop();
                 },
               ),

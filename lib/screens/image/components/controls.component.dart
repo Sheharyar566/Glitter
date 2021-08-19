@@ -78,6 +78,9 @@ class _ControlsState extends State<Controls> {
               children: [
                 if (_showAlert)
                   FavoriteAlert(
+                    onCancelled: () {
+                      _showAlert = false;
+                    },
                     onFavorited: (String _name) {
                       setState(() {
                         _showAlert = false;

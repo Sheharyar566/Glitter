@@ -9,7 +9,6 @@ import 'package:glitter/components/favorite.component.dart';
 import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/functions.util.dart';
-import 'package:palette/palette.dart';
 import 'package:uuid/uuid.dart';
 
 class EditorParams {
@@ -238,6 +237,11 @@ class _PaletteEditorState extends State<PaletteEditor> {
           if (_showDialog)
             FavoriteAlert(
               name: widget.palette == null ? null : widget.palette!.name,
+              onCancelled: () {
+                setState(() {
+                  _showDialog = false;
+                });
+              },
               onFavorited: (String _name) {
                 _onFavorited(context, _name);
               },
