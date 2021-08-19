@@ -3,8 +3,10 @@ import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/enums/screens.enum.dart';
 import 'package:glitter/models/palette.dart';
+import 'package:glitter/screens/editor/editor.screen.dart';
 import 'package:glitter/screens/palettes/components/palette.component.dart';
 import 'package:glitter/utils/db.util.dart';
+import 'package:uuid/uuid.dart';
 
 class PaletteScreen extends StatefulWidget {
   const PaletteScreen({Key? key}) : super(key: key);
@@ -66,19 +68,37 @@ class _PaletteScreenState extends State<PaletteScreen> {
           child: Column(
             children: [
               ..._palettes.map(
-                (_palette) => PaletteComponent(
-                  palette: _palette,
-                  onEdit: () {},
-                  onDelete: () {
-                    _deletePalette(_palette.id);
-                  },
-                ),
+                (_palette) => _palette.id != dbService.customPaletteID
+                    ? PaletteComponent(
+                        palette: _palette,
+                        onEdit: () {
+                          Navigator.pushNamed(
+                            context,
+                            Screen.editor,
+                            arguments: EditorParams(palette: _palette),
+                          );
+                        },
+                        onDelete: () {
+                          _deletePalette(_palette.id);
+                        },
+                      )
+                    : Container(),
               ),
               Container(
                 constraints: BoxConstraints(maxHeight: 115),
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, Screen.editor);
+                    Navigator.pushNamed(
+                      context,
+                      Screen.editor,
+                      arguments: EditorParams(
+                        palette: Palette(
+                          id: Uuid().v4(),
+                          name: 'Untitled',
+                          colors: [],
+                        ),
+                      ),
+                    );
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

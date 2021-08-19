@@ -83,25 +83,35 @@ class _PaletteEditorState extends State<PaletteEditor> {
     super.dispose();
   }
 
-  void addColor() {
-    ColorPalette _temp = ColorPalette.random(1);
-    RgbColor _color = _temp.colors[0].toRgbColor();
+  void addColor(BuildContext context, Color _color) async {
+    try {
+      final bool _isAlreadyPresent =
+          _colors.where((element) => _color.value == element.value).length > 0;
 
-    setState(() {
-      _colors.add(
-        Color.fromRGBO(_color.red, _color.green, _color.blue, 1),
-      );
+      if (!_isAlreadyPresent) {
+        setState(() {
+          _colors.add(_color);
+          _count = _count + 1;
+          _isPickerIntended = false;
+        });
 
-      _count = _count + 1;
-    });
-
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      _controller.animateTo(
-        _controller.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
+          _controller.animateTo(
+            _controller.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Cannot add duplicate colors'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Failed to add color to the palette: $e');
+    }
   }
 
   Future<void> _onFavorited(BuildContext context, String _name) async {
@@ -118,6 +128,8 @@ class _PaletteEditorState extends State<PaletteEditor> {
           colors: _colors.map((_color) => colorToHex(_color)).toList(),
         ),
       );
+
+      await dbService.clearCustomPalette();
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Palette added to favorites!'),
@@ -185,16 +197,8 @@ class _PaletteEditorState extends State<PaletteEditor> {
                   ),
                   if (_isPickerIntended)
                     CustomPicker(
-                      onSelected: (_color) async {
-                        try {
-                          await dbService.addColor(colorToHex(_color));
-                          setState(() {
-                            _colors.add(_color);
-                            _isPickerIntended = false;
-                          });
-                        } catch (e) {
-                          print('Error occured while selecting a color');
-                        }
+                      onSelected: (_color) {
+                        addColor(context, _color);
                       },
                     ),
                   if (_isPickerIntended)

@@ -121,8 +121,24 @@ class _DBService {
         return true;
       }
     } catch (e) {
-      print('Error occured while getting the custom palette: $e');
+      print('Error occured while adding color to the custom palette: $e');
       return false;
+    }
+  }
+
+  Future<void> clearCustomPalette() async {
+    try {
+      final Box<Palette> _box = Hive.box<Palette>(this._paletteDB);
+      final Palette? _temp = _box.get(this._customPalette);
+
+      if (_temp == null) {
+        return;
+      } else {
+        _temp.colors = [];
+        _box.put(this._customPalette, _temp);
+      }
+    } catch (e) {
+      print('Error occured while clearing the custom palette : $e');
     }
   }
 
@@ -180,6 +196,8 @@ class _DBService {
   set darkMode(bool _value) {
     Hive.box(_settingsDB).put(_darkMode, _value);
   }
+
+  String get customPaletteID => this._customPalette;
 }
 
 final _DBService dbService = new _DBService();
