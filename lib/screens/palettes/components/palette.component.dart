@@ -16,6 +16,12 @@ class PaletteComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.only(
+        bottom: 12.5,
+        left: 0,
+        right: 0,
+        top: 0,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Column(
@@ -42,12 +48,7 @@ class PaletteComponent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  palette.name,
-                  style: Theme.of(context).primaryTextTheme.bodyText2?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
+                Text(palette.name),
                 Row(
                   children: [
                     IconButton(

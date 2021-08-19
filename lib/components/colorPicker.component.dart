@@ -41,10 +41,7 @@ class _CustomPickerState extends State<CustomPicker> {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  'Pick a color',
-                  style: Theme.of(context).primaryTextTheme.bodyText2,
-                ),
+                child: Text('Pick a color'),
               ),
               ColorPicker(
                 enableOpacity: false,

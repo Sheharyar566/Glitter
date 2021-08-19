@@ -9,7 +9,8 @@ class _DBService {
   final String _paletteDB = 'favoritePalettes';
   final String _settingsDB = 'settings';
 
-  final String _darkMode = 'Dark Mode';
+  final String _darkMode = 'darkMode';
+  final String _customPalette = 'customPalette';
 
   Future<void> init() async {
     try {
@@ -42,7 +43,7 @@ class _DBService {
     }
   }
 
-  Future<void> addPalette(Palette _palette) async {
+  Future<void> addOrUpdatePalette(Palette _palette, String? _id) async {
     try {
       final isPaletteValid = verifyPalette(_palette);
       if (!isPaletteValid) {
@@ -50,7 +51,7 @@ class _DBService {
       }
 
       final Box<Palette> _box = Hive.box<Palette>(_paletteDB);
-      await _box.put(_palette.id, _palette);
+      await _box.put(_id != null ? _id : _palette.id, _palette);
     } catch (e) {
       print('Error occured while adding the palette to palettes db: $e');
     }
@@ -76,6 +77,52 @@ class _DBService {
       await _box.delete(_id);
     } catch (e) {
       print('Error occured while deleting the colors with index: $e');
+    }
+  }
+
+  List<String> getCustomPalette() {
+    try {
+      final Box<Palette> _box = Hive.box<Palette>(this._paletteDB);
+      final Palette? _temp = _box.get(this._customPalette);
+
+      if (_temp == null) {
+        return [];
+      } else {
+        return _temp.colors;
+      }
+    } catch (e) {
+      print('Error occured while getting the custom palette: $e');
+      throw e;
+    }
+  }
+
+  Future<bool> addColorToCustomPalette(String _color) async {
+    try {
+      final Box<Palette> _box = Hive.box<Palette>(this._paletteDB);
+      final Palette? _temp = _box.get(this._customPalette);
+
+      if (_temp != null) {
+        final List<String> _colorsList = _temp.colors;
+        _colorsList.add(_color);
+
+        await _box.put(this._customPalette, _temp);
+
+        return true;
+      } else {
+        _box.put(
+          this._customPalette,
+          Palette(
+            id: this._customPalette,
+            name: 'Custom Palette',
+            colors: [_color],
+          ),
+        );
+
+        return true;
+      }
+    } catch (e) {
+      print('Error occured while getting the custom palette: $e');
+      return false;
     }
   }
 

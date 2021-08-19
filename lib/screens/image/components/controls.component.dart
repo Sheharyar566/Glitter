@@ -78,8 +78,7 @@ class _ControlsState extends State<Controls> {
               children: [
                 if (_showAlert)
                   FavoriteAlert(
-                    palette: _palette,
-                    onDone: (bool _) {
+                    onFavorited: (String _name) {
                       setState(() {
                         _showAlert = false;
                       });

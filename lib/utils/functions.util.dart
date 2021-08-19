@@ -25,7 +25,7 @@ bool verifyPalette(Palette _palette) {
 }
 
 Future<void> addPalette(Palette _palette) async {
-  await dbService.addPalette(_palette);
+  await dbService.addOrUpdatePalette(_palette, null);
 }
 
 Future<Uint8List> loadImageData(XFile _image) async {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:glitter/components/appbar.component.dart';
@@ -5,13 +6,25 @@ import 'package:glitter/components/color.component.dart';
 import 'package:glitter/components/colorPicker.component.dart';
 import 'package:glitter/components/drawer.component.dart';
 import 'package:glitter/components/favorite.component.dart';
+import 'package:glitter/models/palette.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/functions.util.dart';
 import 'package:palette/palette.dart';
+import 'package:uuid/uuid.dart';
+
+class EditorParams {
+  final bool? isCustom;
+  final Palette? palette;
+
+  EditorParams({this.isCustom, this.palette});
+}
 
 class PaletteEditor extends StatefulWidget {
-  final List<Color>? colorsList;
-  const PaletteEditor({Key? key, this.colorsList}) : super(key: key);
+  final bool? isCustom;
+  final Palette? palette;
+  const PaletteEditor({Key? key, this.isCustom, this.palette})
+      : assert(isCustom != null || palette != null),
+        super(key: key);
 
   @override
   _PaletteEditorState createState() => _PaletteEditorState();
@@ -28,16 +41,40 @@ class _PaletteEditorState extends State<PaletteEditor> {
   @override
   void initState() {
     _controller = ScrollController();
+    initPalette();
+    super.initState();
+  }
 
-    if (widget.colorsList != null) {
-      _colors = widget.colorsList!;
-      _count = widget.colorsList!.length;
-    } else {
-      _colors = [];
-      _count = 0;
+  void initPalette() {
+    if (widget.isCustom == true) {
+      try {
+        final List<String> _temp = dbService.getCustomPalette();
+        final List<Color> _tempColors =
+            _temp.map((_color) => hexToColor(_color)).toList();
+
+        setState(() {
+          _colors = _tempColors;
+          _count = _tempColors.length;
+        });
+
+        return;
+      } catch (e) {
+        print('Error occured while getting the custom palette from db: $e');
+      }
+    } else if (widget.palette != null) {
+      final Palette _palette = widget.palette!;
+      setState(() {
+        _colors = _palette.colors.map((_color) => hexToColor(_color)).toList();
+        _count = _palette.colors.length;
+      });
+
+      return;
     }
 
-    super.initState();
+    setState(() {
+      _colors = [];
+      _count = 0;
+    });
   }
 
   @override
@@ -67,25 +104,54 @@ class _PaletteEditorState extends State<PaletteEditor> {
     });
   }
 
+  Future<void> _onFavorited(BuildContext context, String _name) async {
+    setState(() {
+      _showDialog = false;
+    });
+
+    try {
+      await compute(
+        addPalette,
+        Palette(
+          id: widget.palette == null ? Uuid().v4() : widget.palette!.id,
+          name: _name,
+          colors: _colors.map((_color) => colorToHex(_color)).toList(),
+        ),
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Palette added to favorites!'),
+      ));
+    } catch (e) {
+      print('Failed to add the palette to your favorites list: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
         context: context,
         titleText: 'Palette Editor',
-        actionsList: [
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showDialog = true;
-              });
-            },
-            icon: Icon(
-              Icons.favorite,
-              color: _isFavorite ? Colors.red : null,
-            ),
-          ),
-        ],
+        actionsList: _colors.length > 0
+            ? [
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _showDialog = true;
+                    });
+                  },
+                  icon: widget.palette != null
+                      ? Icon(
+                          Icons.save_rounded,
+                        )
+                      : Icon(
+                          Icons.favorite,
+                          color: _isFavorite ? Colors.red : null,
+                        ),
+                ),
+              ]
+            : [],
       ),
       drawer: CustomDrawer(context),
       body: Stack(
@@ -167,15 +233,9 @@ class _PaletteEditorState extends State<PaletteEditor> {
           ),
           if (_showDialog)
             FavoriteAlert(
-              palette: this._colors,
-              onDone: (bool wasFavorited) {
-                setState(() {
-                  _showDialog = false;
-
-                  if (wasFavorited) {
-                    _isFavorite = true;
-                  }
-                });
+              name: widget.palette == null ? null : widget.palette!.name,
+              onFavorited: (String _name) {
+                _onFavorited(context, _name);
               },
             ),
         ],

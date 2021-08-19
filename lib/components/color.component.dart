@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glitter/utils/db.util.dart';
@@ -9,16 +10,14 @@ enum ColorSection { Details, Controls }
 
 class ColorComponent extends StatefulWidget {
   final Color color;
-  final bool? favorite;
-  final bool? showDelete;
+  final bool? isFavoriteScreen;
   final void Function() remove;
 
   const ColorComponent({
     Key? key,
     required this.color,
     required this.remove,
-    this.favorite,
-    this.showDelete,
+    this.isFavoriteScreen,
   }) : super(key: key);
 
   @override
@@ -26,15 +25,16 @@ class ColorComponent extends StatefulWidget {
 }
 
 class _ColorComponentState extends State<ColorComponent> {
-  bool isFavorite = false;
+  late bool isFavorite;
+  bool isInPalette = false;
   ColorSection _section = ColorSection.Details;
 
   @override
   void initState() {
+    isFavorite = widget.isFavoriteScreen != null
+        ? widget.isFavoriteScreen as bool
+        : false;
     super.initState();
-    setState(() {
-      isFavorite = widget.favorite != null ? widget.favorite as bool : false;
-    });
   }
 
   void copyColor(BuildContext context, String hexValue) async {
@@ -125,19 +125,24 @@ class _ColorComponentState extends State<ColorComponent> {
                               onPressed: () async {
                                 try {
                                   if (isFavorite) {
-                                    if (widget.favorite != null)
+                                    if (widget.isFavoriteScreen != null) {
                                       widget.remove();
-
-                                    setState(() {
-                                      isFavorite = false;
-                                    });
+                                    } else {
+                                      await dbService.deleteColor(hexValue);
+                                      setState(() {
+                                        isFavorite = false;
+                                      });
+                                    }
                                   } else {
                                     await dbService.addColor(hexValue);
                                     setState(() {
                                       isFavorite = true;
                                     });
                                   }
-                                } catch (e) {}
+                                } catch (e) {
+                                  print(
+                                      'Error occured while changing the favorite status: $e');
+                                }
                               },
                               tooltip: isFavorite
                                   ? 'Remove favorite'
@@ -174,18 +179,33 @@ class _ColorComponentState extends State<ColorComponent> {
                         direction: Axis.horizontal,
                         spacing: 15.0,
                         children: [
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {},
-                          ),
+                          if (!isInPalette)
+                            IconButton(
+                              icon: Icon(Icons.add),
+                              onPressed: () async {
+                                try {
+                                  final bool _wasAdded = await dbService
+                                      .addColorToCustomPalette(hexValue);
+                                  print(_wasAdded);
+
+                                  if (_wasAdded) {
+                                    setState(() {
+                                      isInPalette = true;
+                                    });
+                                  }
+                                } catch (e) {
+                                  print(
+                                      'Error occured while adding the color to custom palette: $e');
+                                }
+                              },
+                            ),
                           IconButton(
                             icon: Icon(Icons.copy),
                             onPressed: () {
                               copyColor(context, hexValue);
                             },
                           ),
-                          if (widget.favorite != null &&
-                              widget.favorite != true)
+                          if (widget.isFavoriteScreen != true)
                             IconButton(
                               icon: Icon(
                                 Icons.delete,

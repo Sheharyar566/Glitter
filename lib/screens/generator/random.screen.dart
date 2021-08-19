@@ -156,14 +156,13 @@ class _RandomScreenState extends State<RandomScreen> {
           ),
           if (_showDialog)
             FavoriteAlert(
-              palette: this._colors,
-              onDone: (bool wasFavorited) {
+              onFavorited: (String _name) {
                 setState(() {
                   _showDialog = false;
 
-                  if (wasFavorited) {
-                    _isFavorite = true;
-                  }
+                  // if (wasFavorited) {
+                  //   _isFavorite = true;
+                  // }
                 });
               },
             ),

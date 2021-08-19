@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:glitter/models/palette.dart';
-import 'package:glitter/utils/functions.util.dart';
 
 class FavoriteAlert extends StatefulWidget {
-  final List<Color>? palette;
-  final Function(bool wasFavorited) onDone;
-  const FavoriteAlert({Key? key, required this.palette, required this.onDone})
+  final void Function(String name) onFavorited;
+  final String? name;
+  const FavoriteAlert({Key? key, required this.onFavorited, this.name})
       : super(key: key);
 
   @override
@@ -14,90 +12,56 @@ class FavoriteAlert extends StatefulWidget {
 }
 
 class _FavoriteAlertState extends State<FavoriteAlert> {
-  String name = '';
+  late String name;
 
   @override
   void initState() {
     super.initState();
+
+    name = widget.name != null ? widget.name! : '';
+
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Enter a name for your palette',
-                    style: Theme.of(context)
-                        .primaryTextTheme
-                        .bodyText2
-                        ?.copyWith(fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  TextFormField(
-                    initialValue: name,
-                    onChanged: (value) {
-                      setState(() {
-                        name = value;
-                      });
-                    },
-                    style: Theme.of(context).primaryTextTheme.bodyText2,
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    widget.onDone(false);
-                    Navigator.of(context).pop();
-                  },
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Enter a name for your palette'),
+                SizedBox(
+                  height: 10,
                 ),
-                TextButton(
-                  child: Text('Add to Favorites'),
-                  onPressed: () async {
-                    this._addToFavorites(context);
-                    Navigator.of(context).pop();
+                TextFormField(
+                  initialValue: name,
+                  onChanged: (value) {
+                    setState(() {
+                      name = value;
+                    });
                   },
                 ),
               ],
-            );
-          });
-    });
-  }
-
-  void _addToFavorites(BuildContext context) async {
-    try {
-      if (widget.palette == null) {
-        return;
-      }
-
-      await compute(
-        addPalette,
-        Palette(
-          name: this.name,
-          colors: (widget.palette as List<Color>)
-              .map((_color) => colorToHex(_color))
-              .toList(),
-        ),
+            ),
+            actions: [
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Add to Favorites'),
+                onPressed: () async {
+                  widget.onFavorited(name);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
       );
-
-      setState(() {
-        name = '';
-      });
-
-      widget.onDone(true);
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Palette added to favorites!'),
-      ));
-    } catch (e) {
-      print('Failed to add the palette to your favorites list: $e');
-    }
+    });
   }
 
   @override

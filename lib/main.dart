@@ -24,12 +24,28 @@ class Glitter extends StatelessWidget {
           themeMode: dbService.darkMode ? ThemeMode.dark : ThemeMode.system,
           debugShowCheckedModeBanner: false,
           routes: {
-            Screen.home: (context) => MainPage(),
-            Screen.editor: (context) => PaletteEditor(),
-            Screen.favorites: (context) => FavoriteScreen(),
-            Screen.palettes: (context) => PaletteScreen(),
+            Screen.home: (context) => const MainPage(),
+            Screen.favorites: (context) => const FavoriteScreen(),
+            Screen.palettes: (context) => const PaletteScreen(),
           },
-          initialRoute: Screen.palettes,
+          onGenerateRoute: (route) {
+            print(route);
+            if (route.name == Screen.editor) {
+              final EditorParams _params = route.arguments as EditorParams;
+
+              return MaterialPageRoute(
+                builder: (context) {
+                  return PaletteEditor(
+                    isCustom: _params.isCustom,
+                    palette: _params.palette,
+                  );
+                },
+              );
+            }
+
+            return null;
+          },
+          initialRoute: Screen.home,
         );
       },
     );
