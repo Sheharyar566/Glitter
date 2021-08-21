@@ -54,6 +54,7 @@ class _DBService {
       await _box.put(_id != null ? _id : _palette.id, _palette);
     } catch (e) {
       print('Error occured while adding the palette to palettes db: $e');
+      throw e;
     }
   }
 
@@ -68,6 +69,7 @@ class _DBService {
       await _box.put(_palette.id, _palette);
     } catch (e) {
       print('Error occured while updating the palette in db: $e');
+      throw e;
     }
   }
 
@@ -139,6 +141,7 @@ class _DBService {
       }
     } catch (e) {
       print('Error occured while clearing the custom palette : $e');
+      throw e;
     }
   }
 
@@ -148,6 +151,7 @@ class _DBService {
       await _box.add(_color.toUpperCase());
     } catch (e) {
       print('Error occured while adding the color to colors db: $e');
+      throw e;
     }
   }
 
@@ -157,6 +161,7 @@ class _DBService {
       await _box.deleteAt(_index);
     } catch (e) {
       print('Error occured while deleting the colors with index: $e');
+      throw e;
     }
   }
 
@@ -168,6 +173,7 @@ class _DBService {
       await _box.deleteAt(_temp);
     } catch (e) {
       print('Error occured while delete the colors: $e');
+      throw e;
     }
   }
 
@@ -182,6 +188,7 @@ class _DBService {
 
       return _colors;
     } catch (e) {
+      print('Error occured while getting the colors list: $e');
       return [];
     }
   }

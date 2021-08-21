@@ -1,4 +1,4 @@
-package com.example.glitter
+package com.dev404.glitter
 
 import io.flutter.embedding.android.FlutterActivity
 

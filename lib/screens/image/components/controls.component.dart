@@ -1,17 +1,22 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/color.component.dart';
-import 'package:glitter/screens/image/components/button.component.dart';
+import 'package:glitter/models/palette.dart';
 import 'package:glitter/components/favorite.component.dart';
+import 'package:glitter/utils/db.util.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'package:glitter/utils/themes.util.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:uuid/uuid.dart';
 
 class Controls extends StatefulWidget {
   final Uint8List imageData;
   final Function onReset;
-  final Function togglePicker;
+  final void Function() togglePicker;
+  final bool isPickerEnabled;
   final StreamController<Color?> colorStream;
   const Controls({
     Key? key,
@@ -19,6 +24,7 @@ class Controls extends StatefulWidget {
     required this.onReset,
     required this.togglePicker,
     required this.colorStream,
+    required this.isPickerEnabled,
   }) : super(key: key);
 
   @override
@@ -30,6 +36,7 @@ class _ControlsState extends State<Controls> {
   bool _isLoading = false;
   bool _isMaximized = false;
   bool _showAlert = false;
+  bool _isFavorite = false;
 
   void _generateColorPalette(BuildContext context) async {
     try {
@@ -62,6 +69,45 @@ class _ControlsState extends State<Controls> {
     }
   }
 
+  Future<void> _onFavorited(BuildContext context, String _name) async {
+    setState(() {
+      _showAlert = false;
+    });
+
+    if (!_isFavorite) {
+      if (_palette == null) {
+        return;
+      }
+
+      try {
+        await compute(
+          addPalette,
+          Palette(
+            id: Uuid().v4(),
+            name: _name,
+            colors: _palette!.map((e) => colorToHex(e)).toList(),
+          ),
+        );
+
+        setState(() {
+          _isFavorite = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Palette added to favorites!'),
+        ));
+      } catch (e) {
+        print('Error occured while adding a random palette to db: $e');
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Palette already in favorites'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -79,12 +125,12 @@ class _ControlsState extends State<Controls> {
                 if (_showAlert)
                   FavoriteAlert(
                     onCancelled: () {
-                      _showAlert = false;
-                    },
-                    onFavorited: (String _name) {
                       setState(() {
                         _showAlert = false;
                       });
+                    },
+                    onFavorited: (String _name) {
+                      _onFavorited(context, _name);
                     },
                   ),
                 StreamBuilder<Color?>(
@@ -147,22 +193,32 @@ class _ControlsState extends State<Controls> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     if (_palette != null)
-                                      CustomButton(
-                                        onPressed: () {
-                                          widget.togglePicker();
-                                        },
-                                        activeColor: Colors.red,
-                                        icon: Icons.colorize_outlined,
+                                      IconButton(
+                                        onPressed: widget.togglePicker,
+                                        icon: Icon(
+                                          Icons.colorize_outlined,
+                                          color: widget.isPickerEnabled
+                                              ? Colors.red
+                                              : dbService.darkMode
+                                                  ? Themes.darkPrimaryColor
+                                                  : Themes.primaryColor,
+                                        ),
                                       ),
                                     if (_palette != null)
-                                      CustomButton(
+                                      IconButton(
                                         onPressed: () {
                                           setState(() {
                                             _showAlert = true;
                                           });
                                         },
-                                        activeColor: Colors.red,
-                                        icon: Icons.favorite,
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: _isFavorite
+                                              ? Colors.red
+                                              : dbService.darkMode
+                                                  ? Themes.darkPrimaryColor
+                                                  : Themes.primaryColor,
+                                        ),
                                       ),
                                     _palette != null
                                         ? IconButton(

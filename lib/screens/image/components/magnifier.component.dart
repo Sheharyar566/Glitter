@@ -10,10 +10,8 @@ class Magnifier extends StatelessWidget {
   final double _scale = 1;
 
   Matrix4 _updateMatrix(Offset position) {
-    // final double x = position.dx - (_size / (2 * _scale)) - 5;
-    // final double y = (position.dy * _scale) + (_size / _scale) - 12;
-    final double x = position.dx - (_size / (2 * _scale));
-    final double y = (position.dy) + (_size / 2 / _scale);
+    final double x = position.dx - (_size / (2 / _scale)) - (_size / 10);
+    final double y = (position.dy) + (_size / (2 / _scale)) + (_size / 10);
 
     final Matrix4 _tempMatrix = Matrix4.identity()
       ..scale(_scale, _scale)

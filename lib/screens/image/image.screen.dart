@@ -145,11 +145,12 @@ class _ImageScreenState extends State<ImageScreen> {
                   positionStream: _positionStream as StreamController<Offset?>,
                   colorStream: _colorStream as StreamController<Color?>,
                 ),
-                Magnifier(
-                  positionStream: _positionStream as StreamController<Offset?>,
-                ),
+                // Magnifier(
+                //   positionStream: _positionStream as StreamController<Offset?>,
+                // ),
                 if (_imageData != null)
                   Controls(
+                    isPickerEnabled: _isPickerEnabled,
                     imageData: _imageData as Uint8List,
                     onReset: reset,
                     togglePicker: togglePicker,

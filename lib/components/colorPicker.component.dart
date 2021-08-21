@@ -76,7 +76,7 @@ class _CustomPickerState extends State<CustomPicker> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      _selectedColor = hexToColor(value);
+                      _selectedColor = value.toColor;
                     });
                   },
                 ),

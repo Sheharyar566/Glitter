@@ -4,6 +4,7 @@ import 'package:glitter/router.dart';
 import 'package:glitter/screens/editor/editor.screen.dart';
 import 'package:glitter/screens/favorites/favorites.screen.dart';
 import 'package:glitter/screens/palettes/palettes.screen.dart';
+import 'package:glitter/utils/const.util.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/themes.util.dart';
 
@@ -19,9 +20,10 @@ class Glitter extends StatelessWidget {
       valueListenable: dbService.darkModeListenable,
       builder: (context, _, child) {
         return MaterialApp(
+          title: appName,
           theme: Themes.lightTheme,
           darkTheme: Themes.darkTheme,
-          themeMode: dbService.darkMode ? ThemeMode.dark : ThemeMode.system,
+          themeMode: dbService.darkMode ? ThemeMode.dark : ThemeMode.light,
           debugShowCheckedModeBanner: false,
           routes: {
             Screen.home: (context) => const MainPage(),
