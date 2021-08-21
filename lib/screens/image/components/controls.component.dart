@@ -80,13 +80,13 @@ class _ControlsState extends State<Controls> {
       }
 
       try {
-        await compute(
-          addPalette,
+        await dbService.addOrUpdatePalette(
           Palette(
             id: Uuid().v4(),
             name: _name,
             colors: _palette!.map((e) => colorToHex(e)).toList(),
           ),
+          null,
         );
 
         setState(() {

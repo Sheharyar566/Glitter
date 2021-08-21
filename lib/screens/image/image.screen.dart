@@ -7,7 +7,6 @@ import 'package:glitter/screens/image/components/controls.component.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
 import 'package:glitter/screens/image/components/image.component.dart';
-import 'package:glitter/screens/image/components/magnifier.component.dart';
 import 'package:glitter/utils/db.util.dart';
 import 'package:glitter/utils/functions.util.dart';
 import 'package:glitter/utils/themes.util.dart';

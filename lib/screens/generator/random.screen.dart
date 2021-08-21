@@ -92,13 +92,13 @@ class _RandomScreenState extends State<RandomScreen> {
 
     if (!_isFavorite) {
       try {
-        await compute(
-          addPalette,
+        await dbService.addOrUpdatePalette(
           Palette(
             id: Uuid().v4(),
             name: _name,
             colors: _colors.map((e) => colorToHex(e)).toList(),
           ),
+          null,
         );
 
         setState(() {

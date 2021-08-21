@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:glitter/models/palette.dart';
-import 'package:glitter/utils/db.util.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 
@@ -64,14 +63,6 @@ bool verifyPalette(Palette _palette) {
   }
 
   return true;
-}
-
-Future<void> addPalette(Palette _palette) async {
-  try {
-    await dbService.addOrUpdatePalette(_palette, null);
-  } catch (e) {
-    throw e;
-  }
 }
 
 Future<Uint8List> loadImageData(XFile _image) async {

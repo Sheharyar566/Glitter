@@ -119,13 +119,13 @@ class _PaletteEditorState extends State<PaletteEditor> {
     });
 
     try {
-      await compute(
-        addPalette,
+      await dbService.addOrUpdatePalette(
         Palette(
           id: widget.palette == null ? Uuid().v4() : widget.palette!.id,
           name: _name,
           colors: _colors.map((_color) => colorToHex(_color)).toList(),
         ),
+        null,
       );
 
       await dbService.clearCustomPalette();

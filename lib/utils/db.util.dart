@@ -9,22 +9,29 @@ class _DBService {
   final String _paletteDB = 'favoritePalettes';
   final String _settingsDB = 'settings';
 
+  // Settings database String
   final String _darkMode = 'darkMode';
+  final String _isReviewed = 'isReviewed';
+  final String _runCount = 'runCount';
+  final String _isLater = 'isLater';
+
+  // Palletes Strings
   final String _customPalette = 'customPalette';
 
   Future<void> init() async {
     try {
-      print('Initialized hive databases');
       Hive.registerAdapter(PaletteAdapter());
 
       await Hive.initFlutter();
-      final Box<String> _colors = await Hive.openBox<String>(_colorsDB);
-      final Box<Palette> _palette = await Hive.openBox<Palette>(_paletteDB);
+
+      await Hive.openBox<String>(_colorsDB);
+      await Hive.openBox<Palette>(_paletteDB);
       final Box<dynamic> _settings = await Hive.openBox<dynamic>(_settingsDB);
 
-      print(_colors);
-      print(_palette);
-      print(_settings);
+      final int _count = _settings.get(this._runCount, defaultValue: 0);
+      await _settings.put(this._runCount, _count + 1);
+
+      print('Initialized hive databases');
     } catch (e) {
       print('Failed to initialize the hive databases: $e');
     }
@@ -50,7 +57,8 @@ class _DBService {
         throw new Exception('Palette is invalid!');
       }
 
-      final Box<Palette> _box = Hive.box<Palette>(_paletteDB);
+      print(Hive.isBoxOpen(this._paletteDB));
+      final Box<Palette> _box = Hive.box<Palette>(this._paletteDB);
       await _box.put(_id != null ? _id : _palette.id, _palette);
     } catch (e) {
       print('Error occured while adding the palette to palettes db: $e');
@@ -204,6 +212,60 @@ class _DBService {
     Hive.box(_settingsDB).put(_darkMode, _value);
   }
 
+  // Review setters and getters
+  int get runCount {
+    try {
+      final Box<dynamic> _box = Hive.box<dynamic>(this._settingsDB);
+      final int _runCount = _box.get(this._runCount);
+
+      return _runCount;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  bool get isReviewed {
+    try {
+      final Box<dynamic> _box = Hive.box<dynamic>(this._settingsDB);
+      final bool _isReviewed = _box.get(this._isReviewed, defaultValue: false);
+
+      return _isReviewed;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  bool get isLater {
+    try {
+      final Box<dynamic> _box = Hive.box<dynamic>(this._settingsDB);
+      final bool _isLater = _box.get(this._isLater, defaultValue: false);
+
+      return _isLater;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setIsReviewed(bool status) async {
+    try {
+      final Box<dynamic> _box = Hive.box<dynamic>(this._settingsDB);
+      await _box.put(this._isReviewed, status);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<void> setIsLater(bool status) async {
+    try {
+      final Box<dynamic> _box = Hive.box<dynamic>(this._settingsDB);
+      await _box.put(this._isLater, status);
+      await _box.put(this._runCount, 0);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Palettes getters and setters
   String get customPaletteID => this._customPalette;
 }
 

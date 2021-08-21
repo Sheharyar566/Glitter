@@ -39,6 +39,7 @@ dependencies:
   another_flushbar: ^1.10.24
   image: ^3.0.2
   color: ^3.0.0
+  in_app_review: ^2.0.2
 
 dev_dependencies:
   flutter_test:

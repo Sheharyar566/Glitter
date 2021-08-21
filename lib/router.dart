@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glitter/components/ratingBox.component.dart';
 import 'package:glitter/screens/generator/random.screen.dart';
 import 'package:glitter/screens/image/image.screen.dart';
 import 'package:glitter/screens/wheel/wheel.screen.dart';
@@ -13,6 +14,33 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _index = 0;
+  bool _showRatingBox = false;
+
+  @override
+  void initState() {
+    showReviewBox();
+    super.initState();
+  }
+
+  void showReviewBox() {
+    if (dbService.isReviewed) {
+      return;
+    }
+
+    if (dbService.isLater && dbService.runCount == 3) {
+      Future.delayed(Duration(seconds: 5), () {
+        setState(() {
+          _showRatingBox = true;
+        });
+      });
+    } else if (!dbService.isLater && dbService.runCount == 2) {
+      Future.delayed(Duration(seconds: 5), () {
+        setState(() {
+          _showRatingBox = true;
+        });
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +86,22 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-      body: IndexedStack(
-        index: _index,
+      body: Stack(
         children: [
-          RandomScreen(),
-          ImageScreen(),
-          WheelScreen(),
+          IndexedStack(
+            index: _index,
+            children: [
+              RandomScreen(),
+              ImageScreen(),
+              WheelScreen(),
+            ],
+          ),
+          if (_showRatingBox)
+            RatingBox(onLater: () {
+              setState(() {
+                _showRatingBox = false;
+              });
+            }),
         ],
       ),
     );
