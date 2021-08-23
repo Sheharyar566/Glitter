@@ -14,8 +14,6 @@ String colorToHex(Color _color) {
   final String _blueString = _blue.toRadixString(16);
   final String _greenString = _green.toRadixString(16);
 
-  print('ColorToHex: $_color');
-
   final String _tempColor =
       '#${_redString.length == 1 ? '0$_redString' : _redString}${_greenString.length == 1 ? '0$_greenString' : _greenString}${_blueString.length == 1 ? '0$_blueString' : _blueString}';
 
@@ -55,6 +53,21 @@ Color hexToColor(String _color) {
   final Color _tempColor = Color(int.parse(_hexColor));
 
   return _tempColor;
+}
+
+String rgbToHex(List<int> rgb) {
+  final int _red = rgb[0];
+  final int _green = rgb[1];
+  final int _blue = rgb[2];
+
+  final String _redString = _red.toRadixString(16);
+  final String _blueString = _blue.toRadixString(16);
+  final String _greenString = _green.toRadixString(16);
+
+  final String _tempColor =
+      '#${_redString.length == 1 ? '0$_redString' : _redString}${_greenString.length == 1 ? '0$_greenString' : _greenString}${_blueString.length == 1 ? '0$_blueString' : _blueString}';
+
+  return _tempColor.toUpperCase();
 }
 
 bool verifyPalette(Palette _palette) {

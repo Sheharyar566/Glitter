@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:glitter/components/drawer.component.dart';
+import 'package:glitter/components/loader.component.dart';
 import 'package:glitter/screens/image/components/controls.component.dart';
 import 'package:flutter/material.dart';
 import 'package:glitter/components/appbar.component.dart';
@@ -155,32 +156,7 @@ class _ImageScreenState extends State<ImageScreen> {
                     togglePicker: togglePicker,
                     colorStream: _colorStream as StreamController<Color?>,
                   ),
-                if (_isLoading)
-                  Container(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    color: Colors.black87.withOpacity(0.7),
-                    child: Center(
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: dbService.darkMode
-                                  ? Themes.darkPrimaryColor
-                                  : Themes.primaryColor,
-                              strokeWidth: 2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
+                if (_isLoading) Loader(),
               ],
             ),
     );

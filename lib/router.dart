@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:glitter/components/ratingBox.component.dart';
 import 'package:glitter/screens/generator/random.screen.dart';
+import 'package:glitter/screens/gradients/gradient.screen.dart';
 import 'package:glitter/screens/image/image.screen.dart';
-import 'package:glitter/screens/wheel/wheel.screen.dart';
 import 'package:glitter/utils/db.util.dart';
 
 class MainPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _index = 0;
+  int _index = 2;
   bool _showRatingBox = false;
 
   @override
@@ -93,7 +93,7 @@ class _MainPageState extends State<MainPage> {
             children: [
               RandomScreen(),
               ImageScreen(),
-              WheelScreen(),
+              GradientScreen(),
             ],
           ),
           if (_showRatingBox)
