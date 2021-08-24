@@ -1,15 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:glitter/utils/exports.util.dart';
 import 'package:glitter/utils/functions.util.dart';
 
 class GradientComponent extends StatelessWidget {
   final String name;
   final List<List<int>> colors;
-  const GradientComponent({
+  GradientComponent({
     Key? key,
     required this.name,
     required this.colors,
   }) : super(key: key);
+
+  final GlobalKey _globalKey = GlobalKey();
 
   void copyColor(BuildContext context, String hexValue) async {
     await Clipboard.setData(
@@ -20,6 +25,24 @@ class GradientComponent extends StatelessWidget {
       content: Text('$hexValue copied successfully!'),
     );
     ScaffoldMessenger.of(context).showSnackBar(_snackBar);
+  }
+
+  Future<void> captureImage() async {
+    try {
+      final RenderRepaintBoundary? boundary = _globalKey.currentContext
+          ?.findRenderObject() as RenderRepaintBoundary?;
+
+      if (boundary == null) {
+        throw new Exception('Failed to create gradient image');
+      }
+
+      await compute(
+        exportGradientToImage,
+        boundary,
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -37,18 +60,21 @@ class GradientComponent extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: this
-                          .colors
-                          .map((color) =>
-                              Color.fromRGBO(color[0], color[1], color[2], 1))
-                          .toList(),
+                RepaintBoundary(
+                  key: _globalKey,
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: this
+                            .colors
+                            .map((color) =>
+                                Color.fromRGBO(color[0], color[1], color[2], 1))
+                            .toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -96,7 +122,7 @@ class GradientComponent extends StatelessWidget {
                     runAlignment: WrapAlignment.end,
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: captureImage,
                         icon: Icon(Icons.copy),
                       ),
                     ],
