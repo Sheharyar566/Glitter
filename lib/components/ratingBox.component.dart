@@ -127,7 +127,7 @@ class _RatingBoxState extends State<RatingBox>
 
                             final InAppReview _review = InAppReview.instance;
                             _review.openStoreListing(
-                              appStoreId: 'com.dev404.glitter-pro',
+                              appStoreId: 'com.dev404.glitter',
                             );
                             widget.onLater();
                           } catch (e) {
