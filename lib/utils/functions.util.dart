@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:glitter_pro/models/palette.dart';
+import 'package:glitter/models/palette.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 

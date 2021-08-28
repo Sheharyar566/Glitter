@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glitter_pro/utils/db.util.dart';
+import 'package:glitter/utils/db.util.dart';
 import 'package:in_app_review/in_app_review.dart';
 
 class RatingBox extends StatefulWidget {

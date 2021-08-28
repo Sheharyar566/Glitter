@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:glitter_pro/components/appbar.component.dart';
-import 'package:glitter_pro/components/drawer.component.dart';
-import 'package:glitter_pro/components/loader.component.dart';
-import 'package:glitter_pro/models/gradient.dart';
-import 'package:glitter_pro/screens/gradients/components/color.component.dart';
-import 'package:glitter_pro/utils/functions.util.dart';
+import 'package:glitter/components/appbar.component.dart';
+import 'package:glitter/components/drawer.component.dart';
+import 'package:glitter/components/loader.component.dart';
+import 'package:glitter/models/gradient.dart';
+import 'package:glitter/screens/gradients/components/color.component.dart';
+import 'package:glitter/utils/functions.util.dart';
 import 'components/gradient.component.dart';
 
 class GradientScreen extends StatefulWidget {

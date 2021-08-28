@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:glitter_pro/utils/db.util.dart';
-import 'package:glitter_pro/utils/themes.util.dart';
+import 'package:glitter/utils/db.util.dart';
+import 'package:glitter/utils/themes.util.dart';
 
 class Loader extends StatelessWidget {
   const Loader({Key? key}) : super(key: key);

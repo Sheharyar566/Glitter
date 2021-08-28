@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:glitter_pro/utils/functions.util.dart';
+import 'package:glitter/utils/functions.util.dart';
 
 class GradientComponent extends StatelessWidget {
   final StreamController<List<Color>> controller;
