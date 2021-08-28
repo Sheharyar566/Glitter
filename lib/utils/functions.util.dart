@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:glitter/models/palette.dart';
+import 'package:glitter_pro/models/palette.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 
@@ -68,6 +68,14 @@ String rgbToHex(List<int> rgb) {
       '#${_redString.length == 1 ? '0$_redString' : _redString}${_greenString.length == 1 ? '0$_greenString' : _greenString}${_blueString.length == 1 ? '0$_blueString' : _blueString}';
 
   return _tempColor.toUpperCase();
+}
+
+Color rgbToColor(List<int> rgb) {
+  final int _red = rgb[0];
+  final int _green = rgb[1];
+  final int _blue = rgb[2];
+
+  return Color.fromRGBO(_red, _green, _blue, 1);
 }
 
 bool verifyPalette(Palette _palette) {

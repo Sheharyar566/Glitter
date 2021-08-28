@@ -1,17 +1,15 @@
 import 'dart:io';
-import 'dart:ui' as ui;
 import 'dart:typed_data';
-import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 
-class ExportImageArgs {
-  final String name;
-  final RenderRepaintBoundary boundary;
+// class ExportImageArgs {
+//   final String name;
+//   final RenderRepaintBoundary boundary;
 
-  const ExportImageArgs(this.name, this.boundary);
-}
+//   const ExportImageArgs(this.name, this.boundary);
+// }
 
-Future<void> exportGradientToImage(RenderRepaintBoundary boundary) async {
+Future<int> exportGradientToImage(Map data) async {
   try {
     final Directory? dir = await getExternalStorageDirectory();
 
@@ -23,18 +21,13 @@ Future<void> exportGradientToImage(RenderRepaintBoundary boundary) async {
 
     final File file = File(path);
 
-    final ui.Image image = await boundary.toImage(pixelRatio: 10);
-    final ByteData? bytesData =
-        await image.toByteData(format: ui.ImageByteFormat.png);
-
-    if (bytesData == null) {
-      throw new Exception('Failed to convert image to bytes');
-    }
-
-    final Uint8List bytes = bytesData.buffer.asUint8List();
+    final Uint8List bytes = data['bytes'].buffer.asUint8List();
 
     await file.writeAsBytes(bytes);
+    print('Exported');
+    return 0;
   } catch (e) {
-    throw e;
+    print(e);
+    return 1;
   }
 }

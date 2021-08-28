@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glitter/utils/db.util.dart';
+import 'package:glitter_pro/utils/db.util.dart';
 import 'package:in_app_review/in_app_review.dart';
 
 class RatingBox extends StatefulWidget {
@@ -126,9 +126,8 @@ class _RatingBoxState extends State<RatingBox>
                             await dbService.setIsReviewed(true);
 
                             final InAppReview _review = InAppReview.instance;
-                            // TODO: Set store id
                             _review.openStoreListing(
-                              appStoreId: 'com.dev404.glitter',
+                              appStoreId: 'com.dev404.glitter-pro',
                             );
                             widget.onLater();
                           } catch (e) {

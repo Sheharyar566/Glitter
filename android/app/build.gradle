@@ -39,7 +39,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.dev404.glitter"
+        applicationId "com.dev404.glitter-pro"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:glitter/utils/db.util.dart';
-import 'package:glitter/utils/themes.util.dart';
+import 'package:glitter_pro/utils/db.util.dart';
+import 'package:glitter_pro/utils/themes.util.dart';
 
 class Loader extends StatelessWidget {
   const Loader({Key? key}) : super(key: key);
@@ -10,7 +10,6 @@ class Loader extends StatelessWidget {
     return Container(
       height: double.maxFinite,
       width: double.maxFinite,
-      color: Colors.black87.withOpacity(0.7),
       child: Center(
         child: Card(
           shape: RoundedRectangleBorder(
